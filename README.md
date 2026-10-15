@@ -22,7 +22,8 @@ You are the lone keeper of an arctic weather station for five nights. Keep the g
 - `docs/DESIGN.md`: the full design and the decisions log. Start here.
 - `CLAUDE.md`: standing instructions for Claude Code.
 - `src/config.js`: every tuning number.
-- `src/story/data/`: nights, keeper logs, notes and supplies, as JSON.
+- `src/story/data/`: nights, keeper logs, notes, supplies and subtitles, as JSON.
+- `public/audio/`: recorded sound layers (CC0, from Kenney). Credits in `public/audio/CREDITS.md`.
 
 ## Working on it
 
@@ -41,4 +42,4 @@ In the repository, go to **Settings → Pages** and set **Source** to **GitHub A
 
 ## Status
 
-Milestones M0 to M3 are done: the full night loop, nights 1 and 2 with their story, the day summary and supply drop, saving, settings and the debug panel. See the Milestones section of `docs/DESIGN.md` for what comes next.
+Milestones M0 to M5 are done: the full night loop, nights 1 and 2 with their story, the day summary and supply drop, saving, settings, the debug panel, the low-poly station with its supply room, airlock, doors and flashlight, and the audio pass (positional sound through walls, a sound for every fault, directional subtitles). See the Milestones section of `docs/DESIGN.md` for what comes next.

@@ -1,5 +1,6 @@
-// Generated sound. Every sound is built from oscillators and filtered noise, so the game
-// needs no audio files. Recorded CC0 layers arrive in milestone M5.
+// Generated sound, built from oscillators and filtered noise. This is the base layer of
+// every sound; recorded CC0 layers (samples.js) play on top once they have loaded, so the
+// game still sounds complete if a file fails to load.
 
 export function createNoiseBuffer(ctx, seconds = 2) {
   const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
@@ -133,6 +134,91 @@ export function createHiss(ctx, noise) {
       out.gain.setTargetAtTime(level, ctx.currentTime, 0.6);
     },
   };
+}
+
+/** Fluorescent tubes: a thin 100 Hz hum with a buzzy edge. */
+export function createBuzz(ctx) {
+  const o = ctx.createOscillator();
+  o.type = 'sawtooth';
+  o.frequency.value = 100;
+  const bp = ctx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 900;
+  bp.Q.value = 1.2;
+  const out = ctx.createGain();
+  out.gain.value = 0;
+  o.connect(bp).connect(out);
+  o.start();
+  return {
+    output: out,
+    set(level) {
+      out.gain.setTargetAtTime(level, ctx.currentTime, 0.03);
+    },
+  };
+}
+
+/** Radio standby static: band-limited hiss with a slow crackle. */
+export function createStatic(ctx, noise) {
+  const src = noiseSource(ctx, noise);
+  const bp = ctx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 1900;
+  bp.Q.value = 0.8;
+  const crackle = ctx.createGain();
+  crackle.gain.value = 0.7;
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = 7.3;
+  const depth = ctx.createGain();
+  depth.gain.value = 0.3;
+  lfo.connect(depth).connect(crackle.gain);
+  const out = ctx.createGain();
+  out.gain.value = 0;
+  src.connect(bp).connect(crackle).connect(out);
+  src.start();
+  lfo.start();
+  return {
+    output: out,
+    set(level) {
+      out.gain.setTargetAtTime(level, ctx.currentTime, 0.2);
+    },
+  };
+}
+
+/** The one piece of music: a low, slowly beating drone for the day summary. */
+export function createDrone(ctx) {
+  const out = ctx.createGain();
+  out.gain.value = 0;
+  const lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 240;
+  for (const [f, type] of [[55, 'sawtooth'], [55.35, 'sawtooth'], [82.6, 'triangle']]) {
+    const o = ctx.createOscillator();
+    o.type = type;
+    o.frequency.value = f;
+    o.connect(lp);
+    o.start();
+  }
+  lp.connect(out);
+  return {
+    output: out,
+    set(level) {
+      out.gain.setTargetAtTime(level, ctx.currentTime, level > 0 ? 2.5 : 0.8);
+    },
+  };
+}
+
+/** A short stereo echo tail for the convolver: the room sound of a small steel building. */
+export function createImpulse(ctx, seconds) {
+  const length = Math.floor(ctx.sampleRate * seconds);
+  const buffer = ctx.createBuffer(2, length, ctx.sampleRate);
+  for (let c = 0; c < 2; c++) {
+    const data = buffer.getChannelData(c);
+    for (let i = 0; i < length; i++) {
+      const t = i / length;
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 3.2) * (i < 40 ? i / 40 : 1);
+    }
+  }
+  return buffer;
 }
 
 // ---------- One-shots: each takes (ctx, destination, noiseBuffer) ----------
@@ -303,5 +389,51 @@ export const SOUNDS = {
     const t = ctx.currentTime;
     tone(ctx, dest, t, 330, 0.08, 0.1, 'triangle');
     burst(ctx, dest, noise, t, 1800, 2, 0.2, 0.06);
+  },
+  /** Generator panel alarm, repeated while the engine is stalled: a harsh two-tone buzz. */
+  alarm(ctx, dest) {
+    const t = ctx.currentTime;
+    tone(ctx, dest, t, 740, 0.24, 0.16, 'square');
+    tone(ctx, dest, t + 0.2, 554, 0.24, 0.22, 'square');
+  },
+  /** Out of fuel: two slow, low beeps. */
+  fuelAlarm(ctx, dest) {
+    const t = ctx.currentTime;
+    tone(ctx, dest, t, 392, 0.14, 0.35, 'triangle');
+    tone(ctx, dest, t + 0.6, 392, 0.14, 0.35, 'triangle');
+  },
+  /** A tripped breaker panel: an electrical buzz with crackle. */
+  relay(ctx, dest, noise) {
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = 100;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 1400;
+    bp.Q.value = 2;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.22, t + 0.03);
+    g.gain.setValueAtTime(0.22, t + 0.38);
+    g.gain.linearRampToValueAtTime(0.0001, t + 0.45);
+    o.connect(bp).connect(g).connect(dest);
+    o.start(t);
+    o.stop(t + 0.5);
+    for (let i = 0; i < 4; i++) burst(ctx, dest, noise, t + Math.random() * 0.4, 3500, 2, 0.25, 0.02);
+  },
+  /** A stopped engine ticking as it cools. */
+  tick(ctx, dest) {
+    tone(ctx, dest, ctx.currentTime, 2600 + Math.random() * 900, 0.04, 0.02, 'sine');
+  },
+  /** A fuse blowing. */
+  pop(ctx, dest, noise) {
+    const t = ctx.currentTime;
+    burst(ctx, dest, noise, t, 5000, 1, 0.6, 0.05, 'highpass');
+    thump(ctx, dest, t, 180, 0.4, 0.08);
+  },
+  /** Glass ticking as a crack spreads. */
+  glassTick(ctx, dest, noise) {
+    burst(ctx, dest, noise, ctx.currentTime, 6000, 6, 0.25, 0.03);
   },
 };

@@ -27,16 +27,13 @@ export function createToasts(root) {
 }
 
 /**
- * Every failure and dread sound gets a written line, so nothing is told by sound alone.
+ * Every failure gets a written line, so nothing is told by sound alone. Subtitles for
+ * sounds (with where they came from) are written by the audio module.
  * @param {object} events
  * @param {ReturnType<typeof createToasts>} toasts
- * @param {() => object} getSettings
  */
-export function bindToasts(events, toasts, getSettings) {
+export function bindToasts(events, toasts) {
   const say = (text, kind) => toasts.push(text, kind);
-  const subtitle = (text) => {
-    if (getSettings().subtitles) toasts.push(text, 'subtitle');
-  };
 
   events.on('generator:stalled', () => say('The generator coughs and dies.', 'warn'));
   events.on('generator:outOfFuel', () => say('The generator has run dry.', 'warn'));
@@ -58,8 +55,4 @@ export function bindToasts(events, toasts, getSettings) {
   events.on('flashlight:low', () => say('The flashlight is fading.', 'warn'));
   events.on('flashlight:dead', () => say('The flashlight dies. It recharges from station power while it is off.', 'warn'));
   events.on('flashlight:flat', () => say('The flashlight is flat. Leave it off while the station has power.', 'warn'));
-
-  events.on('scripted:knocks', () => subtitle('[Three knocks at the west door]'));
-  events.on('scripted:roofSteps', () => subtitle('[Footsteps cross the roof, toward the west door]'));
-  events.on('scripted:anomaly', () => subtitle('[Every light in the station stutters]'));
 }
