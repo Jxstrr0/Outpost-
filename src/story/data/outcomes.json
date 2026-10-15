@@ -10,5 +10,9 @@
   "exposure": {
     "text": "Somewhere past the third post you let go of the rope to rub your hands warm. When you reached for it again it wasn't there. The snow was soft, and you were so tired.",
     "short": "You died of exposure."
+  },
+  "answered": {
+    "text": "You walked toward the light.",
+    "short": "You answered."
   }
 }

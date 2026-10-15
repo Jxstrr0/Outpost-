@@ -265,6 +265,15 @@ button {
   transition: opacity 1s linear;
 }
 
+.whiteout {
+  position: absolute;
+  inset: 0;
+  z-index: 5; /* over the meters: walking into the white takes the HUD with it */
+  opacity: 0;
+  background: #f2f5f7;
+  pointer-events: none;
+}
+
 .carry-hint {
   position: absolute;
   right: calc(18px + var(--safe-right));
@@ -1042,4 +1051,46 @@ h2 {
 
 .panel.tape .radio-end {
   margin: 0 0 12px;
+}
+
+/* ---------- Endings ---------- */
+
+.ending p {
+  font-family: var(--font-read);
+  font-size: 1.15em;
+  line-height: 1.6;
+}
+
+.ending .ending-log {
+  margin: 22px 0;
+  padding: 16px 18px;
+  border-left: 3px solid var(--orange);
+  font-family: var(--font-read);
+  line-height: 1.6;
+}
+
+.ending .ending-log .meta {
+  font-family: var(--font);
+  font-size: 0.75em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+.ending .credits {
+  margin-top: 28px;
+  font-size: 0.85em;
+  line-height: 1.8;
+  opacity: 0.75;
+}
+
+.screen.white {
+  background: #f2f5f7;
+  color: #1d2328;
+}
+
+.screen.white h2,
+.screen.white .credits {
+  color: #1d2328;
 }

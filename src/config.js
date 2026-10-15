@@ -68,6 +68,7 @@ export const CONFIG = {
     // Seconds of holding Use. These count real time, so the night keeps moving while you work.
     fuseSeconds: 1.5,
     tapeSeconds: 4,
+    cutTapeSeconds: 2, // cutting the tape off Vance's door
     thawSeconds: 10,
     inspectSeconds: 4, // checking the instruments on the north mast
     deiceSeconds: 3, // knocking the ice off the antenna
@@ -108,6 +109,12 @@ export const CONFIG = {
     footprintEvery: 0.75, // metres between prints
     footprintCount: 220,
     beaconBlinkSeconds: 1.4,
+  },
+
+  endings: {
+    voiceEvery: 6, // game minutes between the voice's calls at the west door, night 5
+    answerMinutes: 10, // game minutes walking out from the open west door before the white
+    answerFadeMinutes: 4, // how fast the white fades if the player turns back
   },
 
   stock: {

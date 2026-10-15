@@ -1,7 +1,8 @@
-// Doors between rooms. A door is 'locked', 'closed' or 'open'. Which doors a night
-// unlocks comes from its JSON; every door not listed there stays locked.
+// Doors between rooms. A door is 'locked', 'taped' (sealed with tape the player can cut),
+// 'closed' or 'open'. Which doors a night unlocks comes from its JSON; every door not
+// listed there stays locked.
 
-export const DOOR_IDS = ['supply', 'airlockInner', 'airlockSide', 'airlockOuter'];
+export const DOOR_IDS = ['supply', 'airlockInner', 'airlockSide', 'airlockOuter', 'bunkRoom', 'west'];
 
 /** Initial door states for a night definition. */
 export function doorsForNight(night) {
@@ -14,7 +15,7 @@ export function doorsForNight(night) {
 export function useDoor(state, { events }, id) {
   const current = state.doors[id];
   if (current === undefined) return false;
-  if (current === 'locked') {
+  if (current === 'locked' || current === 'taped') {
     events.emit('door:locked', { id });
     return false;
   }
@@ -23,10 +24,18 @@ export function useDoor(state, { events }, id) {
   return true;
 }
 
+/** Cut the tape sealing a door. It's closed afterwards, not open. */
+export function cutTape(state, { events }, id) {
+  if (state.doors[id] !== 'taped') return false;
+  state.doors[id] = 'closed';
+  events.emit('door:untaped', { id });
+  return true;
+}
+
 /** Debug: unlock every door. */
 export function unlockDoors(state, { events }) {
   for (const id of DOOR_IDS) {
-    if (state.doors[id] === 'locked') state.doors[id] = 'closed';
+    if (state.doors[id] === 'locked' || state.doors[id] === 'taped') state.doors[id] = 'closed';
   }
   events.emit('door:unlocked');
 }

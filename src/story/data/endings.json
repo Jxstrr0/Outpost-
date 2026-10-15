@@ -1,0 +1,38 @@
+{
+  "relief": {
+    "title": "Relief",
+    "paragraphs": [
+      "At ten to six the wind drops, all at once, like a held breath.",
+      "The helicopter comes in low over the south mast and sets down in its own blizzard. The pilot keeps her helmet on. She looks at the station, then at you, then at the reading book under your arm.",
+      "\"Who's been sending the readings?\" she asks. \"Your radio went dead nine days ago. We thought you'd gone out like the others.\"",
+      "Behind you, someone has put Hollis's mug back on its hook."
+    ]
+  },
+  "record": {
+    "title": "The Record",
+    "paragraphs": [
+      "At ten to six the wind drops. When the helicopter lands you are waiting at the door with all of it: Hollis's count, Vance's log, his tapes, every note, every reading you took.",
+      "You don't let go of it until it's on a desk in Tromsø with the cameras watching. Three weeks later the Polar Meteorological Service closes Kestrel-4, pending review. Imogen Price resigns. Nobody asks you to sign anything.",
+      "Nobody switched the north mast off.",
+      "For eleven days after the station went dark it kept sending readings, north minus south, every two hours, perfectly logged. And every night at 03:00, three short pulses. Never four."
+    ]
+  },
+  "answer": {
+    "title": "Answer",
+    "paragraphs": [
+      "The snow is warm. You didn't expect that.",
+      "The light by the mast is closer than it looked from the door, and the tracks in front of you are your size, and they are fresh."
+    ],
+    "logTitle": "Keeper log · Day 5 · 03:04",
+    "logOpening": "Fifth night. Every reading logged that I could.",
+    "logNoWords": "I didn't say much on the radio. There wasn't much to say.",
+    "logClosing": "The mast light's on. It's warm out here. I'm going to look. Don't follow my tracks."
+  },
+  "credits": [
+    "Outpost · Longlight Interactive",
+    "Design, code and words: Longlight Interactive, built with Claude Code",
+    "Engine: three.js",
+    "Recorded sounds: Kenney (CC0)",
+    "Thank you for keeping the station running."
+  ]
+}

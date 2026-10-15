@@ -1,6 +1,6 @@
 // The building shell: floors, ceiling and walls for every room.
 // North is -z. Main room x -11..0, generator room x 0..5 (both z -5..5),
-// supply room x 1..5 z 5..9, airlock x -2..1 z 5..7.
+// supply room x 1..5 z 5..9, airlock x -2..1 z 5..7, Vance's bunk room x -6..-2 z 5..8.
 // The loop: main → generator → supply → airlock → main.
 
 import * as THREE from 'three';
@@ -23,6 +23,8 @@ export const DOORWAYS = {
   supply: { axis: 'x', fixed: 5, from: 3.7, to: 4.7, top: 2.1, hinge: 'to', swing: 1 },
   airlockSide: { axis: 'z', fixed: 1, from: 5.5, to: 6.5, top: 2.1, hinge: 'to', swing: 1 },
   airlockOuter: { axis: 'x', fixed: 7, from: -1.0, to: 0.0, top: 2.1, hinge: 'from', swing: 1 },
+  bunkRoom: { axis: 'x', fixed: 5, from: -5.85, to: -4.85, top: 2.1, hinge: 'from', swing: 1 },
+  west: { axis: 'z', fixed: -11, from: -2.95, to: -1.85, top: 2.1, hinge: 'from', swing: -1 },
 };
 
 /** Room surface colours: [wall, lower band]. */
@@ -31,6 +33,7 @@ const SKIN = {
   gen: [PALETTE.wall, PALETTE.wallLow],
   supply: [PALETTE.wallSupply, PALETTE.wallSupplyLow],
   airlock: [PALETTE.wallAirlock, PALETTE.wallAirlockLow],
+  bunk: [PALETTE.wallSupply, PALETTE.wallMainLow],
 };
 
 const dw = (id) => ({ from: DOORWAYS[id].from, to: DOORWAYS[id].to, top: DOORWAYS[id].top });
@@ -40,17 +43,21 @@ const dw = (id) => ({ from: DOORWAYS[id].from, to: DOORWAYS[id].to, top: DOORWAY
 const WALLS = [
   ['x', -5, -11, 0, null, 'main'],
   ['x', -5, 0, 5, null, 'gen'],
-  ['x', 5, -11, -2, 'main', null],
+  ['x', 5, -11, -6, 'main', null],
+  ['x', 5, -6, -2, 'main', 'bunk', [dw('bunkRoom')]],
+  ['x', 8, -6, -2, 'bunk', null],
+  ['z', -6, 5, 8, null, 'bunk'],
   ['x', 5, -2, 0, 'main', 'airlock', [dw('airlockInner')]],
   ['x', 5, 0, 1, 'gen', 'airlock'],
   ['x', 5, 1, 5, 'gen', 'supply', [dw('supply')]],
   ['x', 7, -2, 1, 'airlock', null, [dw('airlockOuter')]],
   ['x', 9, 1, 5, 'supply', null],
-  ['z', -11, -5, 5, null, 'main'],
+  ['z', -11, -5, 5, null, 'main', [dw('west')]],
   ['z', 0, -5, 5, 'main', 'gen', [{ from: 1.4, to: 2.6, top: 2.15 }]],
   ['z', 5, -5, 5, 'gen', null],
   ['z', 5, 5, 9, 'supply', null],
-  ['z', -2, 5, 7, null, 'airlock'],
+  ['z', -2, 5, 7, 'bunk', 'airlock'],
+  ['z', -2, 7, 8, 'bunk', null],
   ['z', 1, 5, 7, 'airlock', 'supply', [dw('airlockSide')]],
   ['z', 1, 7, 9, null, 'supply'],
 ];
@@ -147,6 +154,9 @@ export function buildShell(b) {
   const treadMat = new THREE.MeshLambertMaterial({ map: tread });
   floorPlane(group, treadMat, 0, 5, -5, 9);
   floorPlane(group, treadMat, -2, 0, 5, 7);
+  const linoBunk = makeLinoleumTexture();
+  linoBunk.repeat.set(2, 1.5);
+  floorPlane(group, new THREE.MeshLambertMaterial({ map: linoBunk }), -6, -2, 5, 8);
 
   const tiles = makeCeilingTexture();
   tiles.repeat.set(8, 7);

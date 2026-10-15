@@ -388,7 +388,7 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
       const outside = state.room === OUTSIDE;
       let wind = A.windVolume * (state.windowCracked ? A.crackWindBoost : 1);
       if (outside) wind = A.windVolume * A.outsideWindBoost;
-      else if (state.doors.airlockOuter === 'open') wind *= A.openDoorWindBoost;
+      else if (state.doors.airlockOuter === 'open' || state.doors.west === 'open') wind *= A.openDoorWindBoost;
       if (state.gust?.active) wind *= outside ? A.gustWindBoost : A.gustIndoorBoost;
       const next = windLevel + (wind - windLevel) * Math.min(1, dt * 3);
       if (Math.abs(next - windLevel) > 0.002) {
@@ -475,6 +475,7 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
   events.on('door:opened', ({ id }) => atDoor(id, 'doorOpen'));
   events.on('door:closed', ({ id }) => atDoor(id, 'doorClose'));
   events.on('door:locked', ({ id }) => atDoor(id, 'locked'));
+  events.on('door:untaped', ({ id }) => atDoor(id, 'rustle'));
   events.on('scripted:knocks', () => {
     play('knocks', 'westDoor');
     say('knocks', 'westDoor');
@@ -493,6 +494,8 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
   events.on('window:sealed', () => play('cloth', 'window'));
   events.on('supply:taken', () => play('cloth', 'player'));
   events.on('radio:answered', () => play('click', 'radio'));
+  events.on('westDoor:free', () => play('glassTick', 'westDoor'));
+  events.on('westDoor:voice', () => play('whisper', 'westDoor'));
   // Things that aren't there sound exactly like things that are.
   events.on('sanity:hallucination', ({ kind }) => {
     if (kind === 'knocks') {

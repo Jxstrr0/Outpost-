@@ -125,6 +125,7 @@ export function computeObjective(state) {
 export function createHud(root) {
   const hud = el('div', 'hud hidden', root);
   const frost = el('div', 'frost', hud);
+  const white = el('div', 'whiteout', hud); // night 5: walking out toward the light
 
   const status = el('div', 'hud-status', hud);
   const clock = el('div', 'hud-clock', status);
@@ -195,6 +196,7 @@ export function createHud(root) {
       const bodyFrost = (CONFIG.body.frostFrom - state.bodyHeat) / CONFIG.body.frostFrom;
       const frostLevel = Math.max(state.room === 'outside' ? 0 : roomFrost, bodyFrost);
       frost.style.opacity = String(Math.max(0, Math.min(1, frostLevel)));
+      white.style.opacity = String(state.westDoor?.answer ?? 0);
 
       const action = interactor.action;
       crosshair.classList.toggle('active', !!action && !action.disabled);

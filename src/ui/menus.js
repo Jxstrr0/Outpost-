@@ -4,6 +4,7 @@ import { formatClock } from '../core/clock.js';
 import { CONFIG } from '../config.js';
 import { SUPPLIES } from '../story/nights.js';
 import OUTCOMES from '../story/data/outcomes.json';
+import ENDINGS from '../story/data/endings.json';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
@@ -27,8 +28,8 @@ export function createMenus(root) {
   root.appendChild(screen);
   let onEscape = null;
 
-  function show(html, { solid = false, escape = null } = {}) {
-    screen.className = `screen${solid ? ' solid' : ''}`;
+  function show(html, { solid = false, escape = null, white = false } = {}) {
+    screen.className = `screen${solid ? ' solid' : ''}${white ? ' white' : ''}`;
     screen.innerHTML = `<div class="screen-inner">${html}</div>`;
     onEscape = escape;
     const first = screen.querySelector('.btn.primary, .btn');
@@ -340,15 +341,24 @@ export function createMenus(root) {
       on('[data-quit]', onQuit);
     },
 
-    end({ night, onTitle }) {
+    /**
+     * One of the campaign's endings, then the credits.
+     * @param {{ id: 'relief' | 'record' | 'answer', log?: string, onTitle: () => void }} options
+     */
+    ending({ id, log, onTitle }) {
+      const e = ENDINGS[id] || ENDINGS.relief;
+      const logHtml = log
+        ? `<div class="ending-log"><div class="meta">${esc(ENDINGS.answer.logTitle)}</div>${esc(log)}</div>`
+        : '';
       show(
-        `<h2>To be continued</h2>
-        <p style="font-family: var(--font-read); font-size: 1.15em; line-height: 1.55">
-          You made it through night ${night}. The later nights, the yard, the north mast and the radio are still being built.
-        </p>
-        <div class="fineprint">Your logs, notes and supply choices are saved.</div>
-        <div class="btn-row"><button class="btn primary" data-title>Back to title</button></div>`,
-        { solid: true }
+        `<div class="ending">
+          <h2>${esc(e.title)}</h2>
+          ${e.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
+          ${logHtml}
+          <div class="credits">${ENDINGS.credits.map((c) => esc(c)).join('<br>')}</div>
+          <div class="btn-row"><button class="btn primary" data-title>Back to title</button></div>
+        </div>`,
+        { solid: id !== 'answer', white: id === 'answer' }
       );
       on('[data-title]', onTitle);
     },
