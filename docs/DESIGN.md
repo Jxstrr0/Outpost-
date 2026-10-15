@@ -457,7 +457,7 @@ The biggest risk is scope creep in art and the exterior; the fallback for each r
 
 - [x] Final station setting: arctic (current), deep-sea habitat or lunar relay? Answered: arctic (Decisions log).
 - [x] Voice acting for radio and tapes, or text only at launch? Answered: text only (Decisions log).
-- [ ] Free on itch.io, pay-what-you-want, or a paid Steam release later (would mean wrapping the web build)?
+- [ ] Free on itch.io, pay-what-you-want, or a paid Steam release later (would mean wrapping the web build)? Deferred: the owner will set up itch.io later, alongside their other games; the files are ready (docs/ITCH.md).
 - [x] Should a third, secret ending exist for players who find every log? Answered: yes, "The Record" (Decisions log).
 
 ## Decisions log
@@ -510,3 +510,4 @@ Decisions made after the doc was written. They take precedence over anything abo
 | 2026-10-15 | Title screen: a one-line pitch, a Credits screen, and "Endings found: n of 3" once any ending is seen. Endings seen survive starting a new campaign. A loading screen built into the page shows until the station is ready. |
 | 2026-10-15 | Accessibility pass: subtitles and status lines are announced by screen readers; "Reduced flicker" is now "Reduced flicker and motion" and also turns off head bob; it starts on when the device asks for reduced motion. |
 | 2026-10-15 | itch.io: `itch/index.html` embeds the live Pages build in a full-size frame (one tiny upload, always up to date), and `npm run build:itch` makes a self-contained copy with relative paths for uploading instead. Page text and settings are in docs/ITCH.md. The price stays the owner's call (open question above). |
+| 2026-10-15 | itch.io is on hold: the owner will put Outpost on itch.io later, together with their other games. GitHub Pages stays the only home for now. The price question stays open until then. |
