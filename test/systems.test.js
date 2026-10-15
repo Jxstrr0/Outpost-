@@ -139,7 +139,7 @@ test('a player who does nothing loses night 1', () => {
   assert.ok(lost >= 15, `idle player froze on ${lost}/20 seeds`);
 });
 
-test('readings open, recover logs in order, and miss after the window', () => {
+test("readings open, recover their own log entry, and miss after the window", () => {
   const { state, ctx } = setup(night1);
   runUntil(state, ctx, parseClock('20:00') + 1);
   assert.equal(state.readings[0].status, 'open');
@@ -148,6 +148,21 @@ test('readings open, recover logs in order, and miss after the window', () => {
   runUntil(state, ctx, parseClock('22:00') + CONFIG.duties.readingWindow + 1);
   assert.equal(state.readings[1].status, 'missed');
   assert.deepEqual(state.logsRecovered, ['v01']);
+  // Missing the 22:00 loses v02 only: the midnight reading still recovers v03.
+  runUntil(state, ctx, parseClock('00:00') + 1);
+  assert.equal(logReading(state, ctx), 'v03');
+  assert.deepEqual(state.logQueue, ['v02', 'v04', 'v05']);
+});
+
+test('an iced antenna holds the reading window open until the ice is cleared', () => {
+  const { state, ctx } = setup(night3);
+  runUntil(state, ctx, parseClock('20:00') + 1);
+  triggerFailure(state, ctx, 'antennaIcing');
+  ctx.night = { ...night3, failures: {} }; // nothing else goes wrong meanwhile
+  while (state.minute < parseClock('20:00') + CONFIG.duties.readingWindow + 30) stepSimulation(state, ctx);
+  assert.equal(state.readings[0].status, 'open');
+  clearAntenna(state, ctx);
+  assert.equal(logReading(state, ctx), night3.logs[0]);
 });
 
 test('the anomaly reading shows the north mast well below the south', () => {

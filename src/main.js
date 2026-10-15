@@ -179,9 +179,12 @@ function showTitle() {
   desktop.releaseLock();
   panels.close();
   const save = getSave();
+  document.getElementById('boot')?.remove();
   const continueNight = save.currentNight > 1 || save.logsFound.length ? save.currentNight : null;
   menus.title({
     continueNight,
+    endingsSeen: (save.endingsSeen || []).length,
+    onCredits: () => menus.credits(showTitle),
     onBegin: () => {
       audio.start(settings());
       resetCampaign();

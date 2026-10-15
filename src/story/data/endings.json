@@ -27,12 +27,5 @@
     "logOpening": "Fifth night. Every reading logged that I could.",
     "logNoWords": "I didn't say much on the radio. There wasn't much to say.",
     "logClosing": "The mast light's on. It's warm out here. I'm going to look. Don't follow my tracks."
-  },
-  "credits": [
-    "Outpost · Longlight Interactive",
-    "Design, code and words: Longlight Interactive, built with Claude Code",
-    "Engine: three.js",
-    "Recorded sounds: Kenney (CC0)",
-    "Thank you for keeping the station running."
-  ]
+  }
 }

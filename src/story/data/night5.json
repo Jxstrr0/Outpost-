@@ -5,7 +5,7 @@
   "start": {
     "power": 58,
     "fuel": 20,
-    "temp": 3
+    "temp": 4
   },
   "jerryCans": 1,
   "systems": [
@@ -24,11 +24,11 @@
     "bunkRoom": "closed"
   },
   "failures": {
-    "generatorStall": 1.5,
+    "generatorStall": 1.4,
     "breakerTrip": 1.3,
-    "heaterFault": 1.4,
-    "fuelLine": 1.3,
-    "windowCrack": 1.2,
+    "heaterFault": 1.25,
+    "fuelLine": 1.15,
+    "windowCrack": 1.1,
     "antennaIcing": 1.4
   },
   "readings": [

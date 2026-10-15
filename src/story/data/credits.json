@@ -1,0 +1,32 @@
+{
+  "title": "Credits",
+  "sections": [
+    {
+      "head": "Outpost",
+      "lines": [
+        "A Longlight Interactive game.",
+        "Design, words and code built with Claude Code."
+      ]
+    },
+    {
+      "head": "Made with",
+      "lines": [
+        "three.js (MIT licence)",
+        "Vite"
+      ]
+    },
+    {
+      "head": "Sound",
+      "lines": [
+        "Recorded layers from Kenney's Impact Sounds, RPG Audio and Sci-fi Sounds packs (CC0, kenney.nl).",
+        "Wind, the generator, alarms and static are generated in code."
+      ]
+    },
+    {
+      "head": "Thanks",
+      "lines": [
+        "To everyone who kept the station running."
+      ]
+    }
+  ]
+}

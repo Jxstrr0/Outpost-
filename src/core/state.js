@@ -56,17 +56,19 @@ export function createState(night, options = {}) {
     ],
     carrying: null, // id of a jerry can in hand, or null
 
-    readings: (night.readings || []).map((r) => {
+    // Each reading recovers its own log entry, so a missed reading loses that entry only.
+    readings: (night.readings || []).map((r, i) => {
       const due = parseClock(r.time);
       return {
         due,
+        logId: night.logs?.[i] ?? null,
         closes: due + CONFIG.duties.readingWindow,
         status: 'upcoming',
         anomaly: !!r.anomaly,
         values: null,
       };
     }),
-    logQueue: [...(night.logs || [])], // log ids recovered in order, one per logged reading
+    logQueue: [...(night.logs || [])], // log ids not yet recovered tonight
     logsRecovered: [],
     notesFound: [],
     tapesFound: [],
