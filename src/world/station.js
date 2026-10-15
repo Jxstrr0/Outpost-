@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import { CONFIG } from '../config.js';
-import { PALETTE, mat, box } from './assets.js';
+import { PALETTE, mat, box, makeCrackTexture } from './assets.js';
 import { createKit } from './kit.js';
 import { createDecals } from './decals.js';
 import { createBuilder, hitbox } from './rooms/builder.js';
@@ -108,6 +108,15 @@ export function buildStation(scene, camera, { getLogTitle }) {
   const terminal = createTerminalScreen(b.group, anchors.terminalScreen, Math.PI, getLogTitle);
   const lighting = createLighting(scene, anchors);
 
+  // A crack across the north window, shown while it's cracked.
+  const crack = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.7, 0.95),
+    new THREE.MeshBasicMaterial({ map: makeCrackTexture(), transparent: true, depthWrite: false, toneMapped: false })
+  );
+  crack.position.set(anchors.window.x, anchors.window.y, anchors.window.z + 0.035);
+  crack.visible = false;
+  b.group.add(crack);
+
   // Generator status lamp
   const lamp = new THREE.Mesh(
     new THREE.SphereGeometry(0.035, 10, 8),
@@ -209,6 +218,7 @@ export function buildStation(scene, camera, { getLogTitle }) {
 
       b.refs.heaterGrille.material.emissiveIntensity = lighting.heaterGlowLevel();
 
+      crack.visible = state.windowCracked;
       lever.rotation.z = state.breakerTripped ? 0.9 : 0;
       lever.position.y = anchors.breakerLever.y - (state.breakerTripped ? 0.12 : 0);
 

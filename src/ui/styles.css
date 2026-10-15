@@ -184,6 +184,30 @@ button {
   opacity: 0;
 }
 
+.hold-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: conic-gradient(var(--orange) calc(var(--p, 0) * 360deg), rgba(255, 255, 255, 0.12) 0);
+  -webkit-mask: radial-gradient(circle, transparent 13px, #000 14px);
+  mask: radial-gradient(circle, transparent 13px, #000 14px);
+  opacity: 0;
+}
+
+.hold-ring.on {
+  opacity: 1;
+}
+
+.hud-pocket {
+  font-size: 0.7em;
+  color: var(--orange);
+  margin-top: 6px;
+}
+
 .interact-label {
   position: absolute;
   left: 50%;
@@ -847,4 +871,52 @@ h2 {
   .title-sub {
     margin-bottom: 14px;
   }
+}
+
+/* ---------- Radio panel ---------- */
+
+.radio-line {
+  font-family: var(--font-read);
+  font-size: 1.08em;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.radio-line .who {
+  display: block;
+  font-family: var(--font);
+  font-size: 0.68em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.radio-line.you .who {
+  color: var(--orange);
+}
+
+.radio-replies {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.radio-replies .reply {
+  text-align: left;
+}
+
+.radio-end {
+  margin-top: 14px;
+  font-style: italic;
+  color: var(--ink-dim);
+}
+
+.panel.radio {
+  color: #cfe3ee;
+  border-color: #2c4a5a;
+}
+
+.panel.radio .panel-head {
+  border-color: #2c4a5a;
 }

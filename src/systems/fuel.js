@@ -3,7 +3,8 @@ import { CONFIG } from '../config.js';
 /** The generator burns fuel while it runs and stops when the tank is dry. */
 export function updateFuel(state, dt, { events }) {
   if (!state.generator.running) return;
-  state.fuel = Math.max(0, state.fuel - CONFIG.fuel.burn * dt);
+  const burn = CONFIG.fuel.burn * (state.fuelLineFrozen ? CONFIG.fuel.frozenLineBurn : 1);
+  state.fuel = Math.max(0, state.fuel - burn * dt);
   if (state.fuel <= 0) {
     state.generator.running = false;
     events.emit('generator:outOfFuel');

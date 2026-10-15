@@ -3,6 +3,7 @@
 import { formatClock } from '../core/clock.js';
 import { CONFIG } from '../config.js';
 import { SUPPLIES } from '../story/nights.js';
+import OUTCOMES from '../story/data/outcomes.json';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
@@ -183,12 +184,11 @@ export function createMenus(root) {
     },
 
     lost({ state, onRetry, onQuit }) {
+      const outcome = OUTCOMES[state.outcome] || OUTCOMES.frozen;
       show(
         `<h2>${formatClock(state.minute)} · Night ${state.night}</h2>
-        <p style="font-family: var(--font-read); font-size: 1.25em; line-height: 1.5">
-          The cold got into your hands first, then your thinking. You sat down by the dead heater to rest for a minute.
-        </p>
-        <div class="fineprint">You froze. Retry starts this night again from 18:00 with the same supplies.</div>
+        <p style="font-family: var(--font-read); font-size: 1.25em; line-height: 1.5">${esc(outcome.text)}</p>
+        <div class="fineprint">${esc(outcome.short)} Retry starts this night again from 18:00 with the same supplies.</div>
         <div class="btn-row">
           <button class="btn primary" data-retry>Retry night ${state.night}</button>
           <button class="btn" data-quit>Quit to title</button>
