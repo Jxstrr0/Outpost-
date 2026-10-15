@@ -436,4 +436,21 @@ export const SOUNDS = {
   glassTick(ctx, dest, noise) {
     burst(ctx, dest, noise, ctx.currentTime, 6000, 6, 0.25, 0.03);
   },
+  /** An incoming radio call: a two-tone chirp over a burst of static. */
+  ring(ctx, dest, noise) {
+    const t = ctx.currentTime;
+    for (let i = 0; i < 4; i++) tone(ctx, dest, t + i * 0.12, i % 2 ? 1180 : 1480, 0.12, 0.1, 'square');
+    burst(ctx, dest, noise, t, 2000, 0.8, 0.3, 0.5);
+  },
+  /** A loud wash of static. */
+  staticBurst(ctx, dest, noise) {
+    const t = ctx.currentTime;
+    burst(ctx, dest, noise, t, 1800, 0.6, 0.7, 1.6);
+    burst(ctx, dest, noise, t + 0.3, 3200, 1.5, 0.4, 1.2);
+  },
+  /** Breath shaped like a word. Only ever heard by a keeper who's been awake too long. */
+  whisper(ctx, dest, noise) {
+    const t = ctx.currentTime;
+    for (const [at, f, d] of [[0, 2400, 0.25], [0.32, 1600, 0.4], [0.8, 2900, 0.3]]) burst(ctx, dest, noise, t + at, f, 4, 0.22, d);
+  },
 };

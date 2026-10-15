@@ -8,5 +8,10 @@
   "roofSteps": "Footsteps cross the roof",
   "anomaly": "Every light in the station stutters",
   "groan": "Metal groans, somewhere out in the cold",
-  "beeps": "The met console beeps"
+  "beeps": "The met console beeps",
+  "radioCall": "The radio is ringing",
+  "pop": "A sharp pop from the heater",
+  "sputter": "The generator sputters",
+  "windowWind": "Wind whistles through the cracked window",
+  "whisper": "Someone whispers your name"
 }

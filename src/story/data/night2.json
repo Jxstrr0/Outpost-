@@ -2,27 +2,80 @@
   "night": 2,
   "title": "Night 2",
   "intro": "The tracks were gone by noon. Two cans came up with the morning supplies, and the key to the supply room.",
-  "start": { "power": 64, "fuel": 26, "temp": 6 },
+  "start": {
+    "power": 64,
+    "fuel": 26,
+    "temp": 6
+  },
   "jerryCans": 2,
   "systems": [],
   "flashlight": true,
   "newTonight": [
     "A flashlight. Press F, or the TORCH button above USE. It recharges from station power while it is off.",
-    "The supply room is open, through the generator room. The airlock beyond it leads back to the main room."
+    "The supply room is open, through the generator room. The airlock beyond it leads back to the main room.",
+    "The radio set in the supply room. Dispatch calls twice a night: answer before it stops ringing.",
+    "If the heater grille goes dark while the lights are on, its fuse has blown. Spares are on the supply room shelves."
   ],
-  "doors": { "supply": "closed", "airlockInner": "closed", "airlockSide": "closed" },
-  "failures": { "generatorStall": 1.25, "breakerTrip": 1.2 },
+  "doors": {
+    "supply": "closed",
+    "airlockInner": "closed",
+    "airlockSide": "closed"
+  },
+  "failures": {
+    "generatorStall": 1.25,
+    "breakerTrip": 1.0,
+    "heaterFault": 1
+  },
   "readings": [
-    { "time": "20:00" },
-    { "time": "22:00" },
-    { "time": "00:00", "anomaly": true },
-    { "time": "02:00", "anomaly": true },
-    { "time": "04:00" }
+    {
+      "time": "20:00"
+    },
+    {
+      "time": "22:00"
+    },
+    {
+      "time": "00:00",
+      "anomaly": true
+    },
+    {
+      "time": "02:00",
+      "anomaly": true
+    },
+    {
+      "time": "04:00"
+    }
   ],
-  "logs": ["v06", "v07", "v08", "v09", "v10"],
+  "logs": [
+    "v06",
+    "v07",
+    "v08",
+    "v09",
+    "v10"
+  ],
   "notes": [
-    { "id": "n03", "spot": "breaker" },
-    { "id": "n04", "spot": "metconsole" }
+    {
+      "id": "n03",
+      "spot": "breaker"
+    },
+    {
+      "id": "n04",
+      "spot": "metconsole"
+    }
   ],
-  "scripted": [{ "time": "02:40", "event": "roofSteps" }]
+  "scripted": [
+    {
+      "time": "02:40",
+      "event": "radioEcho"
+    }
+  ],
+  "radio": [
+    {
+      "id": "n2a",
+      "time": "21:00"
+    },
+    {
+      "id": "n2b",
+      "time": "01:00"
+    }
+  ]
 }

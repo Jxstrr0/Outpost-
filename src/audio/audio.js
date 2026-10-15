@@ -22,6 +22,7 @@ import {
 import { loadSamples } from './samples.js';
 import { occlusionBetween, occlusionMix, describeDirection } from './space.js';
 import { roomAt, OUTSIDE } from '../world/layout.js';
+import { ringingCall } from '../systems/radio.js';
 import SUBTITLES from '../story/data/subtitles.json';
 
 const A = CONFIG.audio;
@@ -46,7 +47,18 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
   let windAudio = null;
   let engine = null;
   const emitters = {};
-  const timers = { creak: between(A.creakEvery), groan: between(A.groanEvery), beep: 0, alarm: 0, relay: 0, tick: 0 };
+  const timers = {
+    creak: between(A.creakEvery),
+    groan: between(A.groanEvery),
+    beep: 0,
+    alarm: 0,
+    relay: 0,
+    tick: 0,
+    ring: 0,
+    sputter: between(A.sputterEvery),
+    glass: between(A.glassTickEvery),
+  };
+  let windLevel = -1;
   let coolingLeft = 0;
   let elapsed = 0;
   const lastSaid = {};
@@ -72,6 +84,7 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
     lightsMain: { at: mainLights, ref: 1.5, flat: true },
     lightsGen: { at: anchors.fixtureGen, ref: 1.5, flat: true },
     outside: { at: new THREE.Vector3(0, 2, -14), ref: 6, room: OUTSIDE },
+    ghost: { at: new THREE.Vector3(0, 1.6, 0), ref: 1 }, // moved next to the player for hallucinations
   };
 
   /** `flat` emitters use cheaper equal-power panning: only sounds worth locating get HRTF. */
@@ -199,6 +212,35 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
       timers.relay = 1.2;
     }
 
+    if (ringingCall(state)) {
+      timers.ring -= dt;
+      if (timers.ring <= 0) {
+        timers.ring = CONFIG.radio.ringEvery;
+        play('ring', 'radio');
+        say('radioCall', 'radio', true);
+      }
+    } else {
+      timers.ring = 0;
+    }
+
+    if (state.fuelLineFrozen && gen.running) {
+      timers.sputter -= dt;
+      if (timers.sputter <= 0) {
+        timers.sputter = between(A.sputterEvery);
+        play('sputter', 'generator');
+        say('sputter', 'generator', true);
+      }
+    }
+
+    if (state.windowCracked) {
+      timers.glass -= dt;
+      if (timers.glass <= 0) {
+        timers.glass = between(A.glassTickEvery);
+        play('glassTick', 'window');
+        say('windowWind', 'window', true);
+      }
+    }
+
     if (!gen.running && coolingLeft > 0) {
       coolingLeft -= dt;
       timers.tick -= dt;
@@ -303,6 +345,7 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
       if (!listener) return;
       listener.setMasterVolume(settings.masterVolume);
       windAudio.setVolume(A.windVolume);
+      windLevel = A.windVolume;
       for (const e of Object.values(emitters)) e.pa.setVolume(settings.effectsVolume);
     },
 
@@ -338,7 +381,12 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
       const flicker = shaky ? 0.4 + Math.random() * 0.6 : 1;
       loops.buzzMain.set(state.lightsLit ? A.lightBuzzVolume * flicker : 0);
       loops.buzzGen.set(state.power > 0 ? A.lightBuzzVolume * flicker : 0);
-      loops.static.set(state.power > 0 ? A.radioStaticVolume : 0);
+      loops.static.set(state.power > 0 ? A.radioStaticVolume * (ringingCall(state) ? 3 : 1) : 0);
+      const wind = A.windVolume * (state.windowCracked ? A.crackWindBoost : 1);
+      if (wind !== windLevel) {
+        windLevel = wind;
+        windAudio.setVolume(wind);
+      }
 
       updateTells(state, dt);
       updateAmbience(state, dt);
@@ -420,6 +468,43 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
     say('knocks', 'westDoor');
   });
   events.on('scripted:roofSteps', () => audio.roofSteps());
+  events.on('heater:fault', () => {
+    play('pop', 'heater');
+    say('pop', 'heater');
+  });
+  events.on('heater:fixed', () => play('whump', 'heater'));
+  events.on('fuelLine:frozen', () => play('sputter', 'generator'));
+  events.on('fuelLine:thawed', () => play('started', 'generator'));
+  events.on('window:cracked', () => {
+    for (let i = 0; i < 4; i++) setTimeout(() => play('glassTick', 'window'), i * 140);
+  });
+  events.on('window:sealed', () => play('cloth', 'window'));
+  events.on('supply:taken', () => play('cloth', 'player'));
+  events.on('radio:answered', () => play('click', 'radio'));
+  // Things that aren't there sound exactly like things that are.
+  events.on('sanity:hallucination', ({ kind }) => {
+    if (kind === 'knocks') {
+      play('knocks', 'westDoor');
+      say('knocks', 'westDoor');
+    } else if (kind === 'roofSteps') {
+      audio.roofSteps();
+    } else if (kind === 'whisper') {
+      if (ctx) {
+        // Just behind the player's shoulder.
+        camera.getWorldDirection(facing);
+        emitters.ghost.holder.position.set(camera.position.x - facing.x * 1.2, 1.6, camera.position.z - facing.z * 1.2);
+      }
+      play('whisper', 'ghost');
+      say('whisper', null);
+    } else if (kind === 'fakeStall') {
+      play('stall', 'generator');
+    } else if (kind === 'fakeBreaker') {
+      play('clunk', 'breaker');
+    } else if (kind === 'fakeCall') {
+      play('ring', 'radio');
+      say('radioCall', 'radio');
+    }
+  });
   events.on('scripted:anomaly', () => {
     play('drone', 'player');
     say('anomaly', null);

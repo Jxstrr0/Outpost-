@@ -55,4 +55,30 @@ export function bindToasts(events, toasts) {
   events.on('flashlight:low', () => say('The flashlight is fading.', 'warn'));
   events.on('flashlight:dead', () => say('The flashlight dies. It recharges from station power while it is off.', 'warn'));
   events.on('flashlight:flat', () => say('The flashlight is flat. Leave it off while the station has power.', 'warn'));
+
+  events.on('heater:fault', () => say('Pop. The heater grille goes dark: a fuse has blown.', 'warn'));
+  events.on('heater:fixed', () => say('New fuse in. The heater ticks back to life.'));
+  events.on('fuelLine:frozen', () => say('The generator stutters. The fuel line is freezing.', 'warn'));
+  events.on('fuelLine:thawed', () => say('The fuel line runs clear. The engine settles.'));
+  events.on('window:cracked', () => say('A crack runs across the north window. The cold is getting in.', 'warn'));
+  events.on('window:sealed', () => say('Taped. The wind drops to a whistle.'));
+  events.on('supply:taken', ({ item }) => {
+    const text = {
+      fuse: 'A spare fuse, in your pocket. The heater is on the main room west wall.',
+      tape: 'A roll of seal tape, in your pocket.',
+      heatGun: 'The heat gun, in your pocket. Hold USE at the generator to thaw the line.',
+      ration: 'You eat standing up. Cold stew, but your head clears.',
+    }[item];
+    if (text) say(text);
+  });
+  events.on('radio:ringing', () => say('The radio is ringing in the supply room.', 'warn'));
+  events.on('radio:missed', () => say('The radio falls silent. Dispatch will log you as unreachable.', 'warn'));
+  events.on('radio:unpowered', () => say('The radio is dead without station power.', 'warn'));
+  events.on('sanity:low', () => say('Your hands are shaking. Get somewhere lit and warm.', 'warn'));
+  // A hallucinated fault looks exactly like the real thing on the HUD.
+  events.on('sanity:hallucination', ({ kind }) => {
+    if (kind === 'fakeStall') say('The generator coughs and dies.', 'warn');
+    if (kind === 'fakeBreaker') say('Clunk. The main room goes dark: the breaker has tripped.', 'warn');
+    if (kind === 'fakeCall') say('The radio is ringing in the supply room.', 'warn');
+  });
 }

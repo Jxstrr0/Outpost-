@@ -42,4 +42,4 @@ In the repository, go to **Settings → Pages** and set **Source** to **GitHub A
 
 ## Status
 
-Milestones M0 to M5 are done: the full night loop, nights 1 and 2 with their story, the day summary and supply drop, saving, settings, the debug panel, the low-poly station with its supply room, airlock, doors and flashlight, and the audio pass (positional sound through walls, a sound for every fault, directional subtitles). See the Milestones section of `docs/DESIGN.md` for what comes next.
+Milestones M0 to M6 are done: the full night loop, nights 1 and 2 with their story, the day summary and supply drop, saving, settings, the debug panel, the low-poly station with its supply room, airlock, doors and flashlight, and the audio pass (positional sound through walls, a sound for every fault, directional subtitles), and the new systems: radio calls from Dispatch, the NERVES meter, heater fuses, a freezing fuel line, a cracking window and hold-to-repair, across all five nights (nights 3 to 5 still need their logs and notes). See the Milestones section of `docs/DESIGN.md` for what comes next.

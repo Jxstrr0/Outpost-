@@ -1,4 +1,5 @@
 import { CONFIG } from '../config.js';
+import { changeSanity } from './sanity.js';
 
 /** Weather readings open on schedule, then close; logging one recovers a keeper log. */
 export function updateDuties(state, dt, { events, rng }) {
@@ -49,6 +50,7 @@ export function logReading(state, { events }) {
     return null;
   }
   reading.status = 'logged';
+  changeSanity(state, CONFIG.sanity.readingBonus, { events });
   const logId = state.logQueue.shift() || null;
   if (logId) state.logsRecovered.push(logId);
   events.emit('reading:logged', { reading, logId });

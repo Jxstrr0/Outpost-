@@ -1,0 +1,68 @@
+{
+  "night": 4,
+  "title": "Night 4",
+  "intro": "Frost handprints on the inside of the north window this morning. Small ones. The helicopter comes the day after tomorrow.",
+  "start": {
+    "power": 60,
+    "fuel": 22,
+    "temp": 4
+  },
+  "jerryCans": 2,
+  "systems": [
+    "sanity"
+  ],
+  "flashlight": true,
+  "newTonight": [
+    "The north window can crack. Wind gets in and the cold comes twice as fast. Seal it with tape from the supply room: hold USE at the window.",
+    "Dispatch calls three times tonight. Listen carefully to who is calling."
+  ],
+  "doors": {
+    "supply": "closed",
+    "airlockInner": "closed",
+    "airlockSide": "closed"
+  },
+  "failures": {
+    "generatorStall": 1.35,
+    "breakerTrip": 1.1,
+    "heaterFault": 1.2,
+    "fuelLine": 1,
+    "windowCrack": 1
+  },
+  "readings": [
+    {
+      "time": "20:00"
+    },
+    {
+      "time": "22:00"
+    },
+    {
+      "time": "00:00",
+      "anomaly": true
+    },
+    {
+      "time": "02:00",
+      "anomaly": true
+    },
+    {
+      "time": "04:00",
+      "anomaly": true
+    }
+  ],
+  "logs": [],
+  "notes": [],
+  "radio": [
+    {
+      "id": "n4a",
+      "time": "21:00"
+    },
+    {
+      "id": "n4b",
+      "time": "01:30"
+    },
+    {
+      "id": "n4c",
+      "time": "02:30"
+    }
+  ],
+  "scripted": []
+}

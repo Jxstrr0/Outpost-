@@ -169,6 +169,7 @@ export function buildMainRoom(b) {
     k.box(0.4, 0.02, 0.15, C.paper, 0.6, 1.06, 0.05, { ry: 0.3, shade: 0 }); // notebook on the sill
   });
   b.anchor('window', -4.5, 1.55, -4.9);
+  b.interactable('window', hitbox(g, 1.8, 1.0, 0.3, -4.5, 1.55, -4.75));
   d.add('signStation', 1.2, 0.3, -4.5, 2.36, -4.88);
   k.at(-6.6, 2.1, -4.9, 0, () => P.clockRim(k));
   d.add('dial', 0.3, 0.3, -6.6, 2.1, -4.87);

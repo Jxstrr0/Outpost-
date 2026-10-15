@@ -220,6 +220,41 @@ export function makeWindowTexture() {
 }
 
 /** A label or poster drawn on canvas: lines of text on a coloured card. */
+/** A crack across glass: white branching lines on transparent, drawn once. */
+export function makeCrackTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 144;
+  const g = c.getContext('2d');
+  g.strokeStyle = 'rgba(235, 245, 255, 0.85)';
+  g.lineCap = 'round';
+  const branch = (x, y, angle, length, width) => {
+    if (length < 6 || width < 0.4) return;
+    let px = x;
+    let py = y;
+    const steps = 5;
+    g.lineWidth = width;
+    g.beginPath();
+    g.moveTo(px, py);
+    for (let i = 0; i < steps; i++) {
+      angle += Math.sin(px * 0.37 + py * 0.11) * 0.35;
+      px += (Math.cos(angle) * length) / steps;
+      py += (Math.sin(angle) * length) / steps;
+      g.lineTo(px, py);
+    }
+    g.stroke();
+    branch(px, py, angle - 0.6, length * 0.6, width * 0.7);
+    branch(px, py, angle + 0.5, length * 0.55, width * 0.65);
+  };
+  // The impact point low on the right pane, cracks running out across both panes.
+  for (const a of [0, 0.9, 2.1, 3.3, 4.4, 5.4]) branch(178, 98, a, 60, 1.8);
+  g.fillStyle = 'rgba(235, 245, 255, 0.5)';
+  g.beginPath();
+  g.arc(178, 98, 5, 0, Math.PI * 2);
+  g.fill();
+  return canvasTexture(c, false);
+}
+
 export function makeSignTexture(lines, { w = 256, h = 128, bg = '#d8d2c0', ink = '#1d1f20', size = 26 } = {}) {
   const c = document.createElement('canvas');
   c.width = w;

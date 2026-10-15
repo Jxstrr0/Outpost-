@@ -3,7 +3,7 @@
 
 import { parseClock } from '../core/clock.js';
 
-export const SCRIPTED_EVENTS = ['knocks', 'roofSteps', 'anomaly'];
+export const SCRIPTED_EVENTS = ['knocks', 'roofSteps', 'anomaly', 'radioEcho'];
 
 /**
  * @param {object} events - the event bus

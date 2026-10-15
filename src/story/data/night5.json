@@ -1,0 +1,70 @@
+{
+  "night": 5,
+  "title": "Night 5",
+  "intro": "The storm is at its peak. The helicopter lands at 06:00 if the wind drops. One more night.",
+  "start": {
+    "power": 58,
+    "fuel": 20,
+    "temp": 3
+  },
+  "jerryCans": 2,
+  "systems": [
+    "sanity"
+  ],
+  "flashlight": true,
+  "newTonight": [
+    "Everything that can fail tonight will. Keep the lights on."
+  ],
+  "doors": {
+    "supply": "closed",
+    "airlockInner": "closed",
+    "airlockSide": "closed"
+  },
+  "failures": {
+    "generatorStall": 1.5,
+    "breakerTrip": 1.3,
+    "heaterFault": 1.4,
+    "fuelLine": 1.3,
+    "windowCrack": 1.2
+  },
+  "readings": [
+    {
+      "time": "20:00",
+      "anomaly": true
+    },
+    {
+      "time": "22:00",
+      "anomaly": true
+    },
+    {
+      "time": "00:00",
+      "anomaly": true
+    },
+    {
+      "time": "02:00",
+      "anomaly": true
+    },
+    {
+      "time": "04:00",
+      "anomaly": true
+    }
+  ],
+  "logs": [],
+  "notes": [],
+  "radio": [
+    {
+      "id": "n5a",
+      "time": "20:00"
+    },
+    {
+      "id": "n5b",
+      "time": "02:50"
+    }
+  ],
+  "scripted": [
+    {
+      "time": "03:00",
+      "event": "knocks"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "night": 3,
+  "title": "Night 3",
+  "intro": "Vance's bedroll is in the generator room, wedged between the drums. You didn't put it there. Tonight Dispatch wants the north mast inspected.",
+  "start": {
+    "power": 62,
+    "fuel": 24,
+    "temp": 5
+  },
+  "jerryCans": 2,
+  "systems": [
+    "sanity"
+  ],
+  "flashlight": true,
+  "newTonight": [
+    "Your nerves. Darkness and cold wear them down; light, warmth, the radio and doing the job build them back up. Rations from the supply room help.",
+    "The fuel line can freeze. The generator sputters and drinks fuel. Take the heat gun from the supply room and hold USE at the generator to thaw it."
+  ],
+  "doors": {
+    "supply": "closed",
+    "airlockInner": "closed",
+    "airlockSide": "closed"
+  },
+  "failures": {
+    "generatorStall": 1.3,
+    "breakerTrip": 1.0,
+    "heaterFault": 1,
+    "fuelLine": 1
+  },
+  "readings": [
+    {
+      "time": "20:00"
+    },
+    {
+      "time": "22:00",
+      "anomaly": true
+    },
+    {
+      "time": "00:00"
+    },
+    {
+      "time": "02:00",
+      "anomaly": true
+    },
+    {
+      "time": "04:00"
+    }
+  ],
+  "logs": [],
+  "notes": [],
+  "radio": [
+    {
+      "id": "n3a",
+      "time": "20:30"
+    },
+    {
+      "id": "n3b",
+      "time": "02:00"
+    }
+  ],
+  "scripted": [
+    {
+      "time": "03:00",
+      "event": "anomaly"
+    }
+  ]
+}
