@@ -471,3 +471,7 @@ Decisions made after the doc was written. They take precedence over anything abo
 | 2026-10-15 | A third, secret ending exists for players who find every log and note. It is written in M8. |
 | 2026-10-15 | Claude Code merges its own pull requests into `main` once the build passes. |
 | 2026-10-15 | M3 ships nights 1 and 2 only. Night 2's scripted moment is footsteps on the roof until the radio arrives in M6. |
+| 2026-10-15 | M4 builds props in code from simple low-poly shapes, merged into one mesh per room, instead of downloading CC0 .glb kits. There is no asset pipeline to maintain, the download stays small, and the whole station draws in about 25 calls. Individual props can still be swapped for .glb models later. |
+| 2026-10-15 | Layout: the supply room sits south of the generator room (x 1 to 5, z 5 to 9) and the airlock south of the main room (x −2 to 1, z 5 to 7), so the loop main → generator → supply → airlock → main works. The footprint is about 16 × 14 m instead of 22 × 12 m. |
+| 2026-10-15 | The supply room and airlock unlock on night 2, so the loop exists from then on. The outer airlock door stays frozen shut until the exterior arrives (night 3, M7). |
+| 2026-10-15 | Light budget: four point lights in total (main room, generator room, one shared by the supply room and airlock, heater glow) plus the flashlight. A tripped breaker darkens only the main room; a flat battery darkens everything. |

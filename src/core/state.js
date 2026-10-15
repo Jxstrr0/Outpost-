@@ -3,6 +3,7 @@
 
 import { CONFIG } from '../config.js';
 import { parseClock } from './clock.js';
+import { doorsForNight } from '../systems/doors.js';
 
 /**
  * @typedef {'upcoming' | 'open' | 'logged' | 'missed'} ReadingStatus
@@ -37,6 +38,8 @@ export function createState(night, options = {}) {
     lightsLit: true,
     heaterActive: true,
     consolesPowered: true,
+
+    doors: doorsForNight(night),
 
     jerryCans: Array.from({ length: cans }, (_, i) => ({ id: `can-${i}`, state: 'full' })),
     carrying: null, // id of a jerry can in hand, or null

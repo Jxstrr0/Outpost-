@@ -26,6 +26,7 @@ export function createDebugPanel(root, api) {
     <summary>DEBUG <span data-info></span></summary>
     <div class="dbg-body">
       <div class="dbg-row"><span data-clock></span> <span data-fps></span></div>
+      <div class="dbg-row"><span data-stats></span></div>
       <div class="dbg-row">
         <button data-skip="60">+1h</button>
         <button data-skip="15">+15m</button>
@@ -46,6 +47,7 @@ export function createDebugPanel(root, api) {
         <button data-end="frozen">freeze</button>
         <button data-nofail>failures: on</button>
       </div>
+      <div class="dbg-row"><button data-doors>unlock doors</button></div>
       <div class="dbg-row"><button data-wipe>wipe save</button></div>
     </div>`;
   panel.style.pointerEvents = 'auto';
@@ -67,6 +69,7 @@ export function createDebugPanel(root, api) {
     e.target.textContent = `failures: ${on ? 'on' : 'off'}`;
   });
   q('[data-wipe]').addEventListener('click', () => api.wipe());
+  q('[data-doors]').addEventListener('click', () => api.unlockDoors());
 
   let frames = 0;
   let last = performance.now();
@@ -82,6 +85,8 @@ export function createDebugPanel(root, api) {
         q('[data-info]').textContent = `seed ${state.seed}`;
         q('[data-clock]').textContent = `${formatClock(state.minute)} freeze ${state.freezeMinutes.toFixed(0)}m`;
         q('[data-fps]').textContent = `${fps} fps`;
+        const st = api.stats?.();
+        if (st) q('[data-stats]').textContent = `${st.calls} draws · ${(st.triangles / 1000).toFixed(1)}k tris · ${st.lights} lights`;
         panel.querySelectorAll('[data-meter]').forEach((input) => {
           if (document.activeElement !== input) input.value = String(Math.round(state[input.dataset.meter]));
         });

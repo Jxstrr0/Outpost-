@@ -1,0 +1,18 @@
+{
+  "supply": {
+    "name": "Supply room",
+    "locked": "Supply room. The lock has iced over. The key comes up with tomorrow's supplies."
+  },
+  "airlockInner": {
+    "name": "Airlock",
+    "locked": "The airlock door is sealed for the night. Vance's tape is still on the frame."
+  },
+  "airlockSide": {
+    "name": "Airlock",
+    "locked": "The airlock door won't give. Something has frozen in the seal."
+  },
+  "airlockOuter": {
+    "name": "Outer door",
+    "locked": "The outer door is frozen into its frame. Minus thirty out there, and nothing out there needs you tonight."
+  }
+}

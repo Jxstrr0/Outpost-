@@ -16,6 +16,8 @@ import {
   logReading,
   openReading,
   triggerFailure,
+  useDoor,
+  unlockDoors,
 } from '../src/systems/index.js';
 
 const night1 = JSON.parse(readFileSync(new URL('../src/story/data/night1.json', import.meta.url)));
@@ -161,4 +163,28 @@ test('freezing takes 80 game minutes below -6 °C', () => {
   }
   assert.equal(state.outcome, 'frozen');
   assert.ok(Math.abs(minutes - 80) < 1, `froze after ${minutes} minutes`);
+});
+
+test('night 1 keeps every door locked; night 2 opens the supply room and airlock', () => {
+  const one = setup(night1);
+  assert.deepEqual(Object.values(one.state.doors), ['locked', 'locked', 'locked', 'locked']);
+  const two = setup(night2);
+  assert.equal(two.state.doors.supply, 'closed');
+  assert.equal(two.state.doors.airlockInner, 'closed');
+  assert.equal(two.state.doors.airlockSide, 'closed');
+  assert.equal(two.state.doors.airlockOuter, 'locked');
+});
+
+test('doors open and close, locked doors stay shut, and debug unlock spares the outer door', () => {
+  const { state, ctx, log } = setup(night1);
+  assert.equal(useDoor(state, ctx, 'supply'), false);
+  assert.equal(state.doors.supply, 'locked');
+  assert.ok(log.includes('door:locked'));
+  unlockDoors(state, ctx);
+  assert.equal(state.doors.airlockOuter, 'locked');
+  assert.equal(useDoor(state, ctx, 'supply'), true);
+  assert.equal(state.doors.supply, 'open');
+  useDoor(state, ctx, 'supply');
+  assert.equal(state.doors.supply, 'closed');
+  assert.ok(log.includes('door:opened') && log.includes('door:closed'));
 });

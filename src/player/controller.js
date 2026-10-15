@@ -75,6 +75,7 @@ export function createPlayer(camera) {
       const r = P.radius;
       for (let pass = 0; pass < 2; pass++) {
         for (const c of colliders) {
+          if (c.off) continue;
           const cx = Math.max(c.minX, Math.min(this.x, c.maxX));
           const cz = Math.max(c.minZ, Math.min(this.z, c.maxZ));
           const dx = this.x - cx;

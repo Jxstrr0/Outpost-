@@ -9,7 +9,7 @@ import { createRng, nightSeed } from './core/rng.js';
 import { createState } from './core/state.js';
 import { loadSave, getSave, updateSave, updateSettings, resetCampaign, rememberFound } from './core/save.js';
 import { isDebug, createDebugPanel } from './core/debug.js';
-import { stepSimulation, setMeter, forceOutcome, triggerFailure, jumpTo, FAILURE_IDS } from './systems/index.js';
+import { stepSimulation, setMeter, forceOutcome, triggerFailure, jumpTo, unlockDoors, FAILURE_IDS } from './systems/index.js';
 import { buildStation } from './world/station.js';
 import { createPlayer, createInputState } from './player/controller.js';
 import { attachDesktopInput } from './player/input-desktop.js';
@@ -132,8 +132,6 @@ function showTitle() {
   hud.show(false);
   touch.show(false);
   debug?.show(false);
-// Lets automated browser tests inspect and steer a debug session.
-if (debug) window.__outpost = { game, player };
   desktop.releaseLock();
   panels.close();
   const save = getSave();
@@ -312,9 +310,19 @@ const debug = isDebug()
         resetCampaign();
         showTitle();
       },
+      unlockDoors: () => unlockDoors(game.state, game.ctx),
+      stats: () => {
+        let lights = 0;
+        scene.traverse((o) => {
+          if (o.isLight && !o.isAmbientLight && !o.isHemisphereLight && !o.isDirectionalLight) lights++;
+        });
+        return { calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, lights };
+      },
     })
   : null;
 debug?.show(false);
+// Lets automated browser tests inspect and steer a debug session.
+if (debug) window.__outpost = { game, player, station, renderer, scene, camera };
 
 // ---------- Main loop ----------
 
