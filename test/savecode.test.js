@@ -17,6 +17,8 @@ function playedSave() {
     logsFound: ['v01', 'v02', 'v03', 'v04'],
     notesFound: ['n01', 'n02'],
     endingsSeen: ['quiet'],
+    radioTags: ['honest', 'stayed'],
+    radioSaid: ['All quiet here.', "I'm staying put."],
     settings: {
       lookSensitivity: 1.35,
       invertY: true,
@@ -207,5 +209,12 @@ test('restoreSave writes the whole save at once, and copes with blocked storage'
     assert.deepEqual(getSave(), defaultSave());
   } finally {
     delete globalThis.window;
+  }
+});
+
+test('radio replies must be lists of text', () => {
+  for (const bad of [{ radioTags: [3] }, { radioTags: [''] }, { radioSaid: [null] }, { radioSaid: 'hello' }]) {
+    const code = makeSaveCode({ ...playedSave(), ...bad });
+    assert.equal(readSaveCode(code).ok, false, JSON.stringify(bad));
   }
 });

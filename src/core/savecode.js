@@ -140,6 +140,8 @@ const FIELD_CHECKS = {
   logsFound: isIdList,
   notesFound: isIdList,
   endingsSeen: isIdList,
+  radioTags: isIdList,
+  radioSaid: (v) => Array.isArray(v) && v.every((line) => typeof line === 'string'),
 };
 
 const SETTING_CHECKS = {
