@@ -55,6 +55,9 @@ export function bindToasts(events, toasts, getSettings) {
   events.on('log:recovered', () => say('Keeper log entry recovered. Read it at the terminal.'));
   events.on('can:pickedUp', () => say('Jerry can. Take it to the generator.'));
   events.on('flavour', ({ text }) => say(text));
+  events.on('flashlight:low', () => say('The flashlight is fading.', 'warn'));
+  events.on('flashlight:dead', () => say('The flashlight dies. It recharges from station power while it is off.', 'warn'));
+  events.on('flashlight:flat', () => say('The flashlight is flat. Leave it off while the station has power.', 'warn'));
 
   events.on('scripted:knocks', () => subtitle('[Three knocks at the west door]'));
   events.on('scripted:roofSteps', () => subtitle('[Footsteps cross the roof, toward the west door]'));

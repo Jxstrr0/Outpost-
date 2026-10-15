@@ -52,7 +52,7 @@ export function createMenus(root) {
         <div class="fineprint">
           Headphones help: every fault has its own sound.<br />
           Phone: play sideways. Left thumb moves, right thumb looks, USE to interact.<br />
-          Desktop: WASD to move, mouse to look, E or click to use, Esc to pause.
+          Desktop: WASD to move, mouse to look, E or click to use, F for the flashlight, Esc to pause.
         </div>`
       );
       on('[data-continue]', onContinue);
@@ -66,6 +66,7 @@ export function createMenus(root) {
           <div class="big">NIGHT ${night.night}</div>
           <div class="when">18:00 · STATION KESTREL-4</div>
           <p>${esc(night.intro || '')}</p>
+          ${(night.newTonight || []).length ? `<ul class="new-tonight">${night.newTonight.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
           <div class="tap">TAP OR PRESS ANY KEY TO BEGIN</div>
         </div>`,
         { solid: true }

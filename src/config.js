@@ -122,6 +122,22 @@ export const CONFIG = {
     anomalyDarkSeconds: 2,
   },
 
+  flashlight: {
+    drainPerMinute: 0.5, // a full cell lasts about 200 game minutes switched on
+    betterCellDrain: 0.6, // drain multiplier with the better cell from the supply drop
+    rechargePerMinute: 0.9, // while off, if the station has power
+    chargeLoad: 0.02, // station battery used while it recharges
+    lowBelow: 15, // warns, and the beam starts to flicker
+    minToSwitchOn: 3,
+    intensity: 26,
+    distance: 15,
+    decay: 1.4,
+    angle: 0.46, // half-angle of the beam, radians
+    penumbra: 0.5,
+    shadowMapSize: 512,
+    blackoutAmbient: 0.17, // the station is darker in a blackout once you have a flashlight
+  },
+
   doors: {
     swingSpeed: 6, // how fast a door leaf follows its open/closed state (per second)
     openAngle: 1.62, // radians a door swings when open

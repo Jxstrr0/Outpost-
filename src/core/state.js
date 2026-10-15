@@ -40,6 +40,7 @@ export function createState(night, options = {}) {
     consolesPowered: true,
 
     doors: doorsForNight(night),
+    flashlight: { owned: !!night.flashlight, on: false, battery: 100 },
 
     jerryCans: Array.from({ length: cans }, (_, i) => ({ id: `can-${i}`, state: 'full' })),
     carrying: null, // id of a jerry can in hand, or null

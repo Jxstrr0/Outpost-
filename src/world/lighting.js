@@ -161,7 +161,8 @@ export function createLighting(scene, anchors) {
 
       const heaterTarget = state.heaterActive ? 1.6 : 0;
       heaterGlow.intensity += (heaterTarget - heaterGlow.intensity) * Math.min(1, dt * 1.5);
-      hemi.intensity = mode === 'blackout' || mode === 'off' ? L.ambientDark : L.ambient;
+      const dark = state.flashlight.owned ? CONFIG.flashlight.blackoutAmbient : L.ambientDark;
+      hemi.intensity = mode === 'blackout' || mode === 'off' ? dark : L.ambient;
       return mode;
     },
 

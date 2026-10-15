@@ -168,6 +168,8 @@ export function createAudio(camera, scene, anchors, events) {
   events.on('breaker:tripped', () => play('clunk', 'breaker'));
   events.on('breaker:reset', () => play('click', 'breaker'));
   events.on('lights:toggled', () => play('click', 'player'));
+  events.on('flashlight:toggled', () => play('click', 'player'));
+  events.on('flashlight:flat', () => play('click', 'player'));
   events.on('heater:toggled', ({ on }) => play(on ? 'whump' : 'click', 'heater'));
   events.on('reading:open', () => {
     beepTimer = 0;
