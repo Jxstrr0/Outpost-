@@ -49,6 +49,10 @@ export function logReading(state, { events }) {
     events.emit('console:unpowered');
     return null;
   }
+  if (state.antennaIced) {
+    events.emit('console:static');
+    return null;
+  }
   reading.status = 'logged';
   changeSanity(state, CONFIG.sanity.readingBonus, { events });
   const logId = state.logQueue.shift() || null;

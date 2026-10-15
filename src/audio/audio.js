@@ -84,6 +84,7 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
     lightsMain: { at: mainLights, ref: 1.5, flat: true },
     lightsGen: { at: anchors.fixtureGen, ref: 1.5, flat: true },
     outside: { at: new THREE.Vector3(0, 2, -14), ref: 6, room: OUTSIDE },
+    mast: { at: anchors.antenna, ref: 3, room: OUTSIDE },
     ghost: { at: new THREE.Vector3(0, 1.6, 0), ref: 1 }, // moved next to the player for hallucinations
   };
 
@@ -381,11 +382,18 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
       const flicker = shaky ? 0.4 + Math.random() * 0.6 : 1;
       loops.buzzMain.set(state.lightsLit ? A.lightBuzzVolume * flicker : 0);
       loops.buzzGen.set(state.power > 0 ? A.lightBuzzVolume * flicker : 0);
-      loops.static.set(state.power > 0 ? A.radioStaticVolume * (ringingCall(state) ? 3 : 1) : 0);
-      const wind = A.windVolume * (state.windowCracked ? A.crackWindBoost : 1);
-      if (wind !== windLevel) {
-        windLevel = wind;
-        windAudio.setVolume(wind);
+      const hiss = (ringingCall(state) ? 3 : 1) * (state.antennaIced ? A.icedStaticBoost : 1);
+      loops.static.set(state.power > 0 ? A.radioStaticVolume * hiss : 0);
+      // The wind: louder through a cracked window or an open outer door, loudest outside.
+      const outside = state.room === OUTSIDE;
+      let wind = A.windVolume * (state.windowCracked ? A.crackWindBoost : 1);
+      if (outside) wind = A.windVolume * A.outsideWindBoost;
+      else if (state.doors.airlockOuter === 'open') wind *= A.openDoorWindBoost;
+      if (state.gust?.active) wind *= outside ? A.gustWindBoost : A.gustIndoorBoost;
+      const next = windLevel + (wind - windLevel) * Math.min(1, dt * 3);
+      if (Math.abs(next - windLevel) > 0.002) {
+        windLevel = next;
+        windAudio.setVolume(windLevel);
       }
 
       updateTells(state, dt);
@@ -504,6 +512,15 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
       play('ring', 'radio');
       say('radioCall', 'radio');
     }
+  });
+  events.on('antenna:iced', () => play('staticBurst', 'radio'));
+  events.on('antenna:cleared', () => {
+    for (let i = 0; i < 5; i++) setTimeout(() => play('glassTick', 'mast'), i * 90);
+    play('clunk', 'mast');
+  });
+  events.on('mast:inspected', () => play('click', 'mast'));
+  events.on('gust:start', ({ outside }) => {
+    if (outside) say('gust', null);
   });
   events.on('scripted:anomaly', () => {
     play('drone', 'player');

@@ -30,9 +30,13 @@ export function updateFailures(state, dt, { events, rng, night }) {
   if (rng.chance((dt / F.windowCrackEvery) * crackWeight)) {
     triggerFailure(state, { events }, 'windowCrack');
   }
+  const iceWeight = weights.antennaIcing ?? 0;
+  if (rng.chance((dt / F.antennaIcingEvery) * iceWeight)) {
+    triggerFailure(state, { events }, 'antennaIcing');
+  }
 }
 
-export const FAILURE_IDS = ['generatorStall', 'breakerTrip', 'heaterFault', 'fuelLine', 'windowCrack'];
+export const FAILURE_IDS = ['generatorStall', 'breakerTrip', 'heaterFault', 'fuelLine', 'windowCrack', 'antennaIcing'];
 
 /** Force a failure now. Used by random rolls and the debug panel. */
 export function triggerFailure(state, { events }, id) {
@@ -65,6 +69,12 @@ export function triggerFailure(state, { events }, id) {
     if (state.windowCracked) return false;
     state.windowCracked = true;
     events.emit('window:cracked');
+    return true;
+  }
+  if (id === 'antennaIcing') {
+    if (state.antennaIced) return false;
+    state.antennaIced = true;
+    events.emit('antenna:iced');
     return true;
   }
   return false;

@@ -29,7 +29,13 @@ import {
   answerCall,
   chooseReply,
   sanityShock,
+  startGust,
+  inspectMast,
+  clearAntenna,
 } from '../src/systems/index.js';
+import { doorDraft } from '../src/systems/heat.js';
+import { attachScripted } from '../src/story/scripted.js';
+import { tetherLength } from '../src/world/layout.js';
 
 const night1 = JSON.parse(readFileSync(new URL('../src/story/data/night1.json', import.meta.url)));
 const night2 = JSON.parse(readFileSync(new URL('../src/story/data/night2.json', import.meta.url)));
@@ -65,6 +71,8 @@ function keepAlive(state, ctx) {
   replaceFuse(state, ctx);
   sealWindow(state, ctx);
   thawFuelLine(state, ctx);
+  clearAntenna(state, ctx);
+  if (state.mastDuty) inspectMast(state, ctx);
   if (ringingCall(state)) {
     const call = answerCall(state, ctx);
     if (call) chooseReply(state, ctx, call.id, 0, { text: 'All quiet.' });
@@ -195,13 +203,13 @@ test('night 1 keeps every door locked; night 2 opens the supply room and airlock
   assert.equal(two.state.doors.airlockOuter, 'locked');
 });
 
-test('doors open and close, locked doors stay shut, and debug unlock spares the outer door', () => {
+test('doors open and close, locked doors stay shut, and debug unlock opens them all', () => {
   const { state, ctx, log } = setup(night1);
   assert.equal(useDoor(state, ctx, 'supply'), false);
   assert.equal(state.doors.supply, 'locked');
   assert.ok(log.includes('door:locked'));
   unlockDoors(state, ctx);
-  assert.equal(state.doors.airlockOuter, 'locked');
+  assert.equal(state.doors.airlockOuter, 'closed');
   assert.equal(useDoor(state, ctx, 'supply'), true);
   assert.equal(state.doors.supply, 'open');
   useDoor(state, ctx, 'supply');
@@ -392,4 +400,89 @@ test('a competent player survives nights 3 to 5 on most seeds', () => {
     }
     assert.ok(survived >= 24, `night ${night.night}: survived ${survived}/30`);
   }
+});
+
+test('the yard opens on night 3: outer door shut not frozen, cans in the shed, a mast to inspect', () => {
+  assert.equal(setup(night2).state.doors.airlockOuter, 'locked');
+  const { state } = setup(night3);
+  assert.equal(state.doors.airlockOuter, 'closed');
+  assert.equal(state.mastDuty, true);
+  assert.equal(state.jerryCans.filter((c) => c.where === 'shed').length, night3.shedCans);
+  assert.equal(state.jerryCans.filter((c) => c.where === 'generator').length, night3.jerryCans);
+});
+
+test('the mast trip along the tether takes 60 to 90 seconds there and back', () => {
+  const speed = CONFIG.player.walkSpeed * CONFIG.exterior.snowSpeed;
+  const seconds = (2 * tetherLength()) / speed + CONFIG.repairs.inspectSeconds;
+  assert.ok(seconds >= 50 && seconds <= 90, `mast trip takes ${seconds.toFixed(0)} s`);
+});
+
+test('body heat drains outside, faster in a gust, comes back inside, and zero is exposure', () => {
+  const { state, ctx, log } = setup(night3);
+  state.room = 'outside';
+  stepSimulation(state, ctx);
+  const calm = 100 - state.bodyHeat;
+  assert.ok(calm > 0);
+  state.bodyHeat = 100;
+  startGust(state, ctx);
+  stepSimulation(state, ctx);
+  assert.ok(100 - state.bodyHeat > calm * 1.5, 'a gust drains faster');
+  state.room = 'main';
+  state.temp = 18;
+  const before = state.bodyHeat;
+  stepSimulation(state, ctx);
+  assert.ok(state.bodyHeat > before, 'warms up inside');
+  state.room = 'outside';
+  for (let i = 0; i < 5000 && !state.outcome; i++) stepSimulation(state, ctx);
+  assert.equal(state.outcome, 'exposure');
+  assert.ok(log.includes('body:cold') && log.includes('night:lost'));
+});
+
+test('a calm round trip to the mast leaves the player cold but alive', () => {
+  const { state, ctx } = setup(night3);
+  state.room = 'outside';
+  state.gust.next = Infinity;
+  const tick = CONFIG.time.gameMinutesPerSecond / CONFIG.time.ticksPerSecond;
+  const seconds = (2 * tetherLength()) / (CONFIG.player.walkSpeed * CONFIG.exterior.snowSpeed) + CONFIG.repairs.inspectSeconds;
+  const steps = Math.ceil((seconds * CONFIG.time.gameMinutesPerSecond) / tick);
+  for (let i = 0; i < steps; i++) stepSimulation(state, ctx);
+  assert.equal(state.outcome, null);
+  assert.ok(state.bodyHeat > 20 && state.bodyHeat < 70, `body heat after the trip: ${state.bodyHeat.toFixed(0)}`);
+});
+
+test('gusts come on schedule and pass', () => {
+  const { state, ctx, log } = setup(night3);
+  runUntil(state, ctx, state.gust.next + CONFIG.weather.gustMinutes + 1);
+  assert.ok(log.includes('gust:start') && log.includes('gust:end'));
+  assert.equal(state.gust.active, false);
+});
+
+test('an open outer door cools the station, more so with the inner door open too', () => {
+  const { state } = setup(night3);
+  assert.equal(doorDraft(state), 1);
+  state.doors.airlockOuter = 'open';
+  assert.equal(doorDraft(state), CONFIG.heat.outerDoorCooling);
+  state.doors.airlockInner = 'open';
+  assert.equal(doorDraft(state), CONFIG.heat.throughDraftCooling);
+});
+
+test('an iced antenna blocks the radio and the console until it is knocked clear', () => {
+  const { state, ctx, log } = setup(night3);
+  triggerFailure(state, ctx, 'antennaIcing');
+  assert.equal(state.antennaIced, true);
+  state.readings[0].status = 'open';
+  assert.equal(logReading(state, ctx), null);
+  assert.ok(log.includes('console:static'));
+  assert.equal(clearAntenna(state, ctx), true);
+  assert.equal(state.antennaIced, false);
+  assert.equal(clearAntenna(state, ctx), false);
+});
+
+test('inspecting the mast happens once and sets off the second set of footprints on night 3', () => {
+  const { state, ctx, log } = setup(night3);
+  attachScripted(ctx.events, night3);
+  assert.equal(inspectMast(state, ctx), true);
+  assert.equal(inspectMast(state, ctx), false);
+  assert.ok(log.includes('mast:inspected'));
+  assert.ok(log.includes('scripted:footprints'));
 });

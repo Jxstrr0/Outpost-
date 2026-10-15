@@ -51,6 +51,10 @@ export function answerCall(state, { events }) {
     events.emit('radio:unpowered');
     return null;
   }
+  if (state.antennaIced) {
+    events.emit('radio:static');
+    return null;
+  }
   call.status = 'answered';
   changeSanity(state, CONFIG.sanity.radioBonus, { events });
   events.emit('radio:answered', { id: call.id });

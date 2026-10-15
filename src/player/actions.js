@@ -20,6 +20,8 @@ import {
   ringingCall,
   openCall,
   answerCall,
+  inspectMast,
+  clearAntenna,
 } from '../systems/index.js';
 
 const R = CONFIG.repairs;
@@ -85,6 +87,14 @@ export function describeAction(entry, state) {
       return state.pocket.tape
         ? { label: 'Hold to tape over the crack', hold: true, holdSeconds: R.tapeSeconds }
         : { label: 'Cracked: seal tape is in the supply room', disabled: true };
+    case 'mast':
+      if (state.antennaIced) return { label: 'Hold to knock the ice off the antenna', hold: true, holdSeconds: R.deiceSeconds };
+      if (state.mastDuty && !state.mastInspected) {
+        return { label: 'Hold to check the instruments', hold: true, holdSeconds: R.inspectSeconds };
+      }
+      return { label: 'North mast', disabled: !state.mastInspected };
+    case 'westDoorOutside':
+      return { label: 'West door' };
     case 'bunk':
       return { label: 'Your bunk' };
     case 'recorderShelf':
@@ -156,6 +166,14 @@ export function performAction(entry, game) {
       else ctx.events.emit('flavour', { text: 'The radio set hums on standby. Nothing on the channel.' });
       break;
     }
+    case 'mast':
+      if (state.antennaIced) clearAntenna(state, ctx);
+      else if (state.mastDuty && !state.mastInspected) inspectMast(state, ctx);
+      else ctx.events.emit('flavour', { text: 'The instruments tick over. The north pressure gauge reads lower than it should.' });
+      break;
+    case 'westDoorOutside':
+      ctx.events.emit('flavour', { text: 'The west door, from the wrong side. Ice has welded it into the frame.' });
+      break;
     case 'bunk':
       ctx.events.emit('flavour', { text: 'No sleeping on shift.' });
       break;

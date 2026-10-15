@@ -74,6 +74,15 @@ export function bindToasts(events, toasts) {
   events.on('radio:ringing', () => say('The radio is ringing in the supply room.', 'warn'));
   events.on('radio:missed', () => say('The radio falls silent. Dispatch will log you as unreachable.', 'warn'));
   events.on('radio:unpowered', () => say('The radio is dead without station power.', 'warn'));
+  events.on('antenna:iced', () => say('The radio and the met console fill with static. Ice on the mast antenna.', 'warn'));
+  events.on('antenna:cleared', () => say('The ice shatters off the antenna. The radio hiss clears.'));
+  events.on('radio:static', () => say('Nothing but static. The antenna is iced up.', 'warn'));
+  events.on('console:static', () => say('The console shows nothing but snow. The antenna is iced up.', 'warn'));
+  events.on('mast:inspected', () => say('Instruments checked. The north gauge reads low again. Head back.'));
+  events.on('body:cold', () => say("You can't feel your fingers. Get inside.", 'warn'));
+  events.on('gust:start', ({ outside }) => {
+    if (outside) say('A gust tears in off the ice. You can barely see the rope.', 'warn');
+  });
   events.on('sanity:low', () => say('Your hands are shaking. Get somewhere lit and warm.', 'warn'));
   // A hallucinated fault looks exactly like the real thing on the HUD.
   events.on('sanity:hallucination', ({ kind }) => {
