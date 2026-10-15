@@ -1,7 +1,10 @@
 // Saving: one localStorage key. Every access is wrapped, because storage can be
 // missing or blocked (private windows, previews, cleared site data).
+// Save codes (core/savecode.js) turn this same save into text and back.
 
 export const SAVE_KEY = 'outpost.save.v1';
+export const SAVE_VERSION = 1;
+export const TEXT_SIZES = ['small', 'medium', 'large'];
 
 export const DEFAULT_SETTINGS = Object.freeze({
   lookSensitivity: 1,
@@ -13,9 +16,13 @@ export const DEFAULT_SETTINGS = Object.freeze({
   textSize: 'medium', // small | medium | large
 });
 
-function defaultSave() {
+/**
+ * A brand new save. Adding a field? Give it a default here; save codes pick it up
+ * automatically (core/savecode.js checks it has the same type as this default).
+ */
+export function defaultSave() {
   return {
-    version: 1,
+    version: SAVE_VERSION,
     highestNight: 1,
     currentNight: 1,
     supplyChoices: {}, // { [nightNumber]: ['fuel', 'fuses'] } chosen before that night
@@ -63,12 +70,26 @@ export function updateSettings(changes) {
   return current.settings;
 }
 
+/** Write the save. Returns false if this browser won't store it. */
 export function writeSave() {
   try {
     window.localStorage.setItem(SAVE_KEY, JSON.stringify(current));
+    return true;
   } catch {
     // Storage unavailable: the game still plays, it just won't remember.
+    return false;
   }
+}
+
+/**
+ * Replace everything with a save read from a save code. The code has already been
+ * fully checked (readSaveCode), so this is one write of the whole save, never half.
+ * Returns false if this browser won't store it; the restored progress still
+ * works until the page is closed.
+ */
+export function restoreSave(save) {
+  current = { ...defaultSave(), ...save, settings: { ...DEFAULT_SETTINGS, ...save.settings } };
+  return writeSave();
 }
 
 /** Start a new campaign but keep settings. */

@@ -243,7 +243,7 @@ outpost/
   src/
     main.js                 boot, renderer, main loop
     config.js               every tuning number in one place
-    core/                   state.js, events.js, rng.js, save.js, debug.js
+    core/                   state.js, events.js, rng.js, save.js, savecode.js, debug.js
     world/                  station.js, rooms/, exterior.js, lighting.js, assets.js
     player/                 controller.js, input-desktop.js, input-touch.js, interact.js
     systems/                time.js, power.js, fuel.js, heat.js, sanity.js, failures.js, duties.js
@@ -267,6 +267,8 @@ outpost/
 ### Save data
 
 One localStorage key, `outpost.save.v1`, storing: highest night reached, supply choices, logs and notes found, ending(s) seen, and settings. A night in progress is not saved; quitting restarts the night.
+
+**Save codes** (`core/savecode.js`) move that save between browsers and phones with no server. Back up (title screen or pause menu, under "Save code") shows the whole save as one line of text starting `OP1:`, with a Copy button. Restore takes a pasted code, shows what's in it next to what's saved now, asks before replacing anything, then writes the whole save in one go. The code is the save as JSON in base64url (letters, digits, `-` and `_`, so chat apps leave it alone) plus a 6-character checksum, so a code with a missing or changed character is turned down with a plain message instead of half-loading. Codes from another game, from a newer version (`OP2:`, or a save version above 1) or with a field of the wrong type are turned down the same way. Fields missing from an older code get their defaults. A code is about 350 to 900 characters, small enough not to need compression.
 
 ### Performance budget
 
@@ -479,3 +481,4 @@ Decisions made after the doc was written. They take precedence over anything abo
 | 2026-10-15 | Recorded sound layers come from Kenney's CC0 packs (Impact Sounds, RPG Audio, Sci-fi Sounds), because freesound.org can't be reached from the build environment. They ship as small mono MP3s (about 0.5 MB in total; MP3 plays on every phone browser, Ogg doesn't on older iPhones) and play on top of the generated sounds, which stay as the fallback. |
 | 2026-10-15 | Walls muffle sound: each sound source runs through a low-pass filter that closes with every wall or shut door between it and the player, and the sources the player has to find use head-related (HRTF) panning. |
 | 2026-10-15 | Faults keep sounding until they're fixed: a stalled generator buzzes an alarm every few seconds, an empty tank beeps, a tripped breaker panel buzzes, a stopped engine ticks as it cools. Subtitles for these and for the dread sounds say where the sound came from ("to your right, in the generator room"). |
+| 2026-10-15 | Save codes added at the owner's request, `OP1:` prefix, local only: the code is made and read in the page, nothing is sent anywhere. It carries the whole save, settings included. Back up and Restore sit under "Save code" on the title screen and the pause menu. |

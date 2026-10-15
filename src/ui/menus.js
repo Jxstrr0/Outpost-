@@ -1,10 +1,24 @@
-// Title, night card, pause, settings, day summary, lost and end screens.
+// Title, night card, pause, settings, save codes, day summary, lost and end screens.
 
 import { formatClock } from '../core/clock.js';
 import { CONFIG } from '../config.js';
 import { SUPPLIES } from '../story/nights.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+/** The "Save code: Back up / Restore" pair on the title and pause menus. */
+const SAVE_CODE_BUTTONS = `<div class="menu-caption" id="save-code-caption">Save code</div>
+  <div class="menu-row" role="group" aria-labelledby="save-code-caption">
+    <button class="btn" data-backup>Back up</button>
+    <button class="btn" data-restore>Restore</button>
+  </div>`;
+
+/** The code box's own text-editing keys must never reach the game controls. Escape still closes the screen. */
+function keepKeysInBox(box) {
+  box.addEventListener('keydown', (e) => {
+    if (e.code !== 'Escape') e.stopPropagation();
+  });
+}
 
 export function createMenus(root) {
   const screen = document.createElement('div');
@@ -40,7 +54,7 @@ export function createMenus(root) {
       onEscape = null;
     },
 
-    title({ continueNight, onBegin, onContinue, onSettings }) {
+    title({ continueNight, onBegin, onContinue, onSettings, onBackup, onRestore }) {
       show(
         `<h1 class="title-logo">OUTPOST</h1>
         <div class="title-sub">Station Kestrel-4 · Longlight Interactive</div>
@@ -48,6 +62,7 @@ export function createMenus(root) {
           ${continueNight ? `<button class="btn primary" data-continue>Continue: night ${continueNight}</button>` : ''}
           <button class="btn ${continueNight ? '' : 'primary'}" data-begin>${continueNight ? 'New campaign' : 'Begin shift'}</button>
           <button class="btn" data-settings>Settings</button>
+          ${SAVE_CODE_BUTTONS}
         </div>
         <div class="fineprint">
           Headphones help: every fault has its own sound.<br />
@@ -58,6 +73,8 @@ export function createMenus(root) {
       on('[data-continue]', onContinue);
       on('[data-begin]', onBegin);
       on('[data-settings]', onSettings);
+      on('[data-backup]', onBackup);
+      on('[data-restore]', onRestore);
     },
 
     nightCard(night, onDone) {
@@ -84,7 +101,7 @@ export function createMenus(root) {
       setTimeout(() => window.addEventListener('keydown', finish), 250);
     },
 
-    pause({ onResume, onSettings, onRestart, onQuit }) {
+    pause({ onResume, onSettings, onRestart, onQuit, onBackup, onRestore }) {
       show(
         `<h2>Paused</h2>
         <div class="menu">
@@ -92,6 +109,7 @@ export function createMenus(root) {
           <button class="btn" data-settings>Settings</button>
           <button class="btn" data-restart>Restart this night</button>
           <button class="btn" data-quit>Quit to title</button>
+          ${SAVE_CODE_BUTTONS}
         </div>`,
         { escape: onResume }
       );
@@ -99,6 +117,128 @@ export function createMenus(root) {
       on('[data-settings]', onSettings);
       on('[data-restart]', onRestart);
       on('[data-quit]', onQuit);
+      on('[data-backup]', onBackup);
+      on('[data-restore]', onRestore);
+    },
+
+    /** Shows the save code in a read-only box with a Copy button. */
+    backup({ code, midNight, onBack }) {
+      show(
+        `<h2>Back up</h2>
+        <p class="code-help" id="code-help">This code is all your saved progress and settings. Keep it somewhere safe, like your notes app, and paste it into Restore on any phone or browser to carry on there.</p>
+        <label class="code-label" for="code-box">Your save code</label>
+        <textarea id="code-box" class="code-box" rows="5" readonly spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="code-help"></textarea>
+        <div class="code-msg" role="status" aria-live="polite" data-msg></div>
+        ${midNight ? '<div class="fineprint">The night you are playing now is not in the code yet: the game saves between nights.</div>' : ''}
+        <div class="btn-row">
+          <button class="btn primary" data-copy>Copy code</button>
+          <button class="btn" data-back>Back</button>
+        </div>`,
+        { escape: onBack }
+      );
+      const box = screen.querySelector('#code-box');
+      const msg = screen.querySelector('[data-msg]');
+      box.value = code;
+      keepKeysInBox(box);
+      const selectAll = () => {
+        box.focus({ preventScroll: true });
+        box.select();
+        box.setSelectionRange(0, box.value.length);
+      };
+      box.addEventListener('focus', selectAll);
+      // Older browsers, and pages not on https, have no clipboard API: select the code
+      // and try the old copy command, or ask the player to copy it by hand.
+      const copyBySelecting = () => {
+        selectAll();
+        let copied = false;
+        try {
+          copied = document.execCommand('copy');
+        } catch {
+          copied = false;
+        }
+        msg.textContent = copied
+          ? 'Copied. Paste it into your notes app or a message to yourself.'
+          : 'The code is selected. Long-press it (or right-click) and choose Copy.';
+      };
+      on('[data-copy]', () => {
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(code).then(
+            () => (msg.textContent = 'Copied. Paste it into your notes app or a message to yourself.'),
+            copyBySelecting
+          );
+        } else copyBySelecting();
+      });
+      on('[data-back]', onBack);
+    },
+
+    /**
+     * Paste a code, check it, confirm, then restore. `read` checks a code without
+     * changing anything; only `onRestore` writes, and only after the player says yes.
+     */
+    restore({ read, describe, current, midNight, onRestore, onDone, onBack }) {
+      let pasted = '';
+
+      const pasteScreen = () => {
+        show(
+          `<h2>Restore</h2>
+          <p class="code-help" id="code-help">Paste a save code from Back up. It replaces the progress saved in this browser.</p>
+          <label class="code-label" for="code-box">Save code</label>
+          <textarea id="code-box" class="code-box" rows="5" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" placeholder="OP1:..." aria-describedby="code-help code-error"></textarea>
+          <div class="code-msg error" id="code-error" role="alert" data-msg></div>
+          <div class="btn-row">
+            <button class="btn primary" data-check>Restore</button>
+            <button class="btn" data-back>Back</button>
+          </div>`,
+          { escape: onBack }
+        );
+        const box = screen.querySelector('#code-box');
+        const msg = screen.querySelector('[data-msg]');
+        box.value = pasted;
+        keepKeysInBox(box);
+        // With a mouse and keyboard, start in the box. On a phone, wait for a tap so the
+        // keyboard doesn't jump up over the screen.
+        if (window.matchMedia?.('(pointer: fine)').matches) box.focus({ preventScroll: true });
+        box.addEventListener('input', () => (msg.textContent = ''));
+        on('[data-check]', () => {
+          pasted = box.value;
+          const result = read(pasted);
+          if (result.ok) confirmScreen(result.save);
+          else msg.textContent = result.message;
+        });
+        on('[data-back]', onBack);
+      };
+
+      const confirmScreen = (save) => {
+        show(
+          `<h2>Replace your progress?</h2>
+          <dl class="code-compare">
+            <dt>In this browser now</dt><dd>${esc(describe(current))}</dd>
+            <dt>In the code</dt><dd>${esc(describe(save))}</dd>
+          </dl>
+          <p class="code-help">This can't be undone.${midNight ? ' The night you are playing now will end.' : ''}</p>
+          <div class="btn-row">
+            <button class="btn primary" data-yes>Replace my progress</button>
+            <button class="btn" data-no>Cancel</button>
+          </div>`,
+          { escape: pasteScreen }
+        );
+        // Start on Cancel, so a stray Enter can't wipe anything.
+        screen.querySelector('[data-no]').focus({ preventScroll: true });
+        on('[data-no]', pasteScreen);
+        on('[data-yes]', () => {
+          const stored = onRestore(save);
+          show(
+            `<h2>Progress restored</h2>
+            <p class="code-help">${esc(describe(save))}.</p>
+            ${stored ? '' : '<p class="code-help warn">This browser is blocking saves, so it will forget this when the page closes. Keep your code.</p>'}
+            <div class="btn-row"><button class="btn primary" data-done>Continue</button></div>`,
+            { escape: onDone }
+          );
+          on('[data-done]', onDone);
+        });
+      };
+
+      pasteScreen();
     },
 
     settings(settings, onChange, onBack) {
