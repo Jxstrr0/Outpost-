@@ -30,9 +30,10 @@ export function updateHeat(state, dt, { events }) {
   }
 }
 
-/** How much faster the station cools with the outer airlock door open. */
+/** How much faster the station cools with an outside door open. */
 export function doorDraft(state) {
   const d = state.doors || {};
+  if (d.west === 'open') return H.throughDraftCooling; // straight into the main room
   if (d.airlockOuter !== 'open') return 1;
   return d.airlockInner === 'open' || d.airlockSide === 'open' ? H.throughDraftCooling : H.outerDoorCooling;
 }

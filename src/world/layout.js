@@ -7,6 +7,7 @@ export const ROOMS = {
   generator: { name: 'the generator room', minX: 0, maxX: 5, minZ: -5, maxZ: 5 },
   supply: { name: 'the supply room', minX: 1, maxX: 5, minZ: 5, maxZ: 9 },
   airlock: { name: 'the airlock', minX: -2, maxX: 1, minZ: 5, maxZ: 7 },
+  bunk: { name: "Vance's room", minX: -6, maxX: -2, minZ: 5, maxZ: 8 },
 };
 
 export const OUTSIDE = 'outside';
@@ -18,6 +19,8 @@ export const ROOM_LINKS = [
   { a: 'supply', b: 'airlock', door: 'airlockSide' },
   { a: 'airlock', b: 'main', door: 'airlockInner' },
   { a: 'airlock', b: OUTSIDE, door: 'airlockOuter' },
+  { a: 'main', b: 'bunk', door: 'bunkRoom' },
+  { a: 'main', b: OUTSIDE, door: 'west' },
 ];
 
 /** The room a point is in, or 'outside'. */
@@ -58,7 +61,7 @@ export function openHops(from, to, doors = {}) {
 
 /**
  * The yard (night 3 on). North is -z. The outer airlock door opens south at (-0.5, 7).
- * The tether runs west along the station's south side, up past the west door, and out
+ * The tether runs west along the station's south side (clear of Vance's room), up past the west door, and out
  * to the north mast, so the walk there and back takes 60 to 90 seconds.
  */
 export const YARD = {
@@ -69,9 +72,9 @@ export const YARD = {
   mast: { x: -8, z: -26 },
   shed: { minX: 8, maxX: 11, minZ: -4, maxZ: 0 }, // open on its west side
   tether: [
-    [-0.5, 8.4],
-    [-6, 8.6],
-    [-13.6, 8.4],
+    [-0.5, 8.6],
+    [-6, 9.3],
+    [-13.6, 8.8],
     [-14, 1],
     [-13.6, -7.5],
     [-11.5, -16],

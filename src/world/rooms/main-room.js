@@ -196,13 +196,7 @@ export function buildMainRoom(b) {
   });
   d.floor('blobLong', 1.5, 0.7, -7.4, 4.65);
 
-  // --- West door (the only way out of the main room) ---
-  k.at(-10.94, 0, -1.875, Math.PI / 2, () => P.doorLeaf(k, 1.05, 2.1, 0x46525a, { heavy: true }));
-  k.box(0.12, 2.24, 0.08, C.frame, -10.92, 1.12, -2.98);
-  k.box(0.12, 2.24, 0.08, C.frame, -10.92, 1.12, -1.82);
-  k.box(0.12, 0.08, 1.24, C.frame, -10.92, 2.22, -2.4);
-  k.box(0.02, 2.0, 0.04, 0xb8c4cc, -10.86, 1.05, -2.94, { shade: 0 }); // frost on the seal
-  b.interactable('westDoor', hitbox(g, 0.4, 2.1, 1.1, -10.8, 1.05, -2.4));
+  // --- West door: the leaf is built with the other doors; frozen shut but for one hour ---
   b.anchor('westDoor', -10.8, 1.2, -2.4);
   b.anchor('mugWestDoor', -10.45, 0, -2.4);
   const exit = new THREE.Mesh(

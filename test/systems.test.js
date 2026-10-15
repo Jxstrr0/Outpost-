@@ -33,7 +33,10 @@ import {
   inspectMast,
   clearAntenna,
   recordTape,
+  cutTape,
+  freeWestDoor,
 } from '../src/systems/index.js';
+import { foundEverything, pickEnding, answerLog } from '../src/story/endings.js';
 import { doorDraft } from '../src/systems/heat.js';
 import { attachScripted } from '../src/story/scripted.js';
 import { tetherLength } from '../src/world/layout.js';
@@ -196,7 +199,7 @@ test('freezing takes 80 game minutes below -6 °C', () => {
 
 test('night 1 keeps every door locked; night 2 opens the supply room and airlock', () => {
   const one = setup(night1);
-  assert.deepEqual(Object.values(one.state.doors), ['locked', 'locked', 'locked', 'locked']);
+  assert.ok(Object.values(one.state.doors).every((d) => d === 'locked'));
   const two = setup(night2);
   assert.equal(two.state.doors.supply, 'closed');
   assert.equal(two.state.doors.airlockInner, 'closed');
@@ -535,4 +538,83 @@ test('a tape counts once, however many times it is played', () => {
   assert.equal(recordTape(state, ctx, 't3'), false);
   assert.deepEqual(state.tapesFound, ['t3']);
   assert.equal(log.filter((e) => e === 'tape:found').length, 1);
+});
+
+test("Vance's room is sealed until night 4, where its tape can be cut, and stays open on night 5", () => {
+  for (const night of [night1, night2, night3]) assert.equal(setup(night).state.doors.bunkRoom, 'locked');
+  const { state, ctx, log } = setup(night4);
+  assert.equal(state.doors.bunkRoom, 'taped');
+  assert.equal(useDoor(state, ctx, 'bunkRoom'), false);
+  assert.equal(cutTape(state, ctx, 'bunkRoom'), true);
+  assert.equal(state.doors.bunkRoom, 'closed');
+  assert.ok(log.includes('door:untaped'));
+  assert.equal(cutTape(state, ctx, 'bunkRoom'), false);
+  assert.equal(useDoor(state, ctx, 'bunkRoom'), true);
+  assert.equal(setup(night5).state.doors.bunkRoom, 'closed');
+});
+
+const ENDINGS = JSON.parse(readFileSync(new URL('../src/story/data/endings.json', import.meta.url)));
+
+test('the west door stays frozen until 03:00 on night 5, the voice calls, and it freezes again at 04:00', () => {
+  for (const night of [night1, night4]) {
+    const { state, ctx } = setup(night);
+    runUntil(state, ctx, parseClock('03:30'));
+    assert.equal(state.doors.west, 'locked');
+  }
+  const { state, ctx, log } = setup(night5);
+  state.sanity = 100;
+  runUntil(state, ctx, parseClock('02:59'));
+  assert.equal(state.doors.west, 'locked');
+  assert.equal(useDoor(state, ctx, 'west'), false);
+  runUntil(state, ctx, parseClock('03:20'));
+  assert.equal(state.doors.west, 'closed');
+  assert.ok(log.includes('westDoor:free'));
+  assert.ok(log.filter((e) => e === 'westDoor:voice').length >= 3);
+  runUntil(state, ctx, parseClock('04:05'));
+  assert.equal(state.doors.west, 'locked');
+  assert.ok(log.includes('westDoor:frozen'));
+});
+
+test('walking out of the open west door is the answer; turning back lets the white fade', () => {
+  const { state, ctx, log } = setup(night5);
+  freeWestDoor(state, ctx);
+  assert.equal(useDoor(state, ctx, 'west'), true);
+  state.room = 'outside';
+  for (let i = 0; i < 5; i++) stepSimulation(state, ctx);
+  const partway = state.westDoor.answer;
+  assert.ok(partway > 0 && partway < 1);
+  state.room = 'main';
+  for (let i = 0; i < 5; i++) stepSimulation(state, ctx);
+  assert.ok(state.westDoor.answer < partway);
+  state.room = 'outside';
+  for (let i = 0; i < 400 && !state.outcome; i++) stepSimulation(state, ctx);
+  assert.equal(state.outcome, 'answered');
+  assert.ok(log.includes('night:answered'));
+});
+
+test('the open west door chills the main room fast', () => {
+  const { state } = setup(night5);
+  state.doors.west = 'open';
+  assert.equal(doorDraft(state), CONFIG.heat.throughDraftCooling);
+});
+
+test('endings: answer wins, then the record for finding everything, then relief', () => {
+  const nights = [night1, night2, night3, night4, night5];
+  const logs = nights.flatMap((n) => n.logs);
+  const notes = nights.flatMap((n) => n.notes.map((x) => x.id));
+  assert.equal(foundEverything(nights, logs, notes), true);
+  assert.equal(foundEverything(nights, logs.slice(1), notes), false);
+  assert.equal(foundEverything(nights, logs, notes.slice(1)), false);
+  assert.equal(pickEnding('answered', true), 'answer');
+  assert.equal(pickEnding('survived', true), 'record');
+  assert.equal(pickEnding('survived', false), 'relief');
+});
+
+test("the answer ending's log is written in the player's own radio words", () => {
+  const log = answerLog(ENDINGS.answer, ['Then who was that?', 'All quiet', 'All quiet']);
+  assert.ok(log.includes('Then who was that?'));
+  assert.ok(log.includes('All quiet.'));
+  assert.equal(log.match(/All quiet/g).length, 1);
+  assert.ok(log.endsWith(ENDINGS.answer.logClosing));
+  assert.ok(answerLog(ENDINGS.answer, []).includes(ENDINGS.answer.logNoWords));
 });

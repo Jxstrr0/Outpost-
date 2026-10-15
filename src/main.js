@@ -24,6 +24,7 @@ import {
   sanityShock,
   setPlayerRoom,
   startGust,
+  freeWestDoor,
   FAILURE_IDS,
 } from './systems/index.js';
 import { roomAt } from './world/layout.js';
@@ -41,6 +42,8 @@ import { createPanels } from './ui/panels.js';
 import { createMenus } from './ui/menus.js';
 import { NIGHTS, LAST_NIGHT, LOGS, getNight, applySupplies } from './story/nights.js';
 import { attachScripted, SCRIPTED_EVENTS } from './story/scripted.js';
+import { foundEverything, pickEnding, answerLog } from './story/endings.js';
+import ENDINGS from './story/data/endings.json';
 
 const T = CONFIG.time;
 const R = CONFIG.render;
@@ -323,7 +326,9 @@ function handleOutcome() {
   desktop.releaseLock();
   panels.close();
 
-  if (state.outcome === 'survived') {
+  if (state.outcome === 'answered') {
+    showEnding('answer');
+  } else if (state.outcome === 'survived') {
     game.mode = 'summary';
     audio.setDrone(true);
     const nextNight = night.night < LAST_NIGHT ? night.night + 1 : null;
@@ -336,8 +341,8 @@ function handleOutcome() {
           updateSave({ supplyChoices: { ...getSave().supplyChoices, [nextNight]: choices }, currentNight: nextNight });
           beginNight(nextNight);
         } else {
-          game.mode = 'end';
-          menus.end({ night: night.night, onTitle: showTitle });
+          const save = getSave();
+          showEnding(pickEnding('survived', foundEverything(NIGHTS, save.logsFound, save.notesFound)));
         }
       },
     });
@@ -345,6 +350,15 @@ function handleOutcome() {
     game.mode = 'lost';
     menus.lost({ state, onRetry: () => beginNight(night.night), onQuit: showTitle });
   }
+}
+
+/** The end of the campaign: one of three endings, then the credits. */
+function showEnding(id) {
+  game.mode = 'end';
+  audio.setDrone(true);
+  rememberFound('endingsSeen', [id]);
+  const log = id === 'answer' ? answerLog(ENDINGS.answer, getSave().radioSaid || []) : null;
+  menus.ending({ id, log, onTitle: showTitle });
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -397,6 +411,16 @@ const debug = isDebug()
       hallucinate: () => events.emit('sanity:hallucination', { kind: ['knocks', 'whisper', 'fakeStall', 'roofSteps'][Math.floor(Math.random() * 4)] }),
       giveFlashlight: () => giveFlashlight(game.state),
       gust: () => startGust(game.state, game.ctx),
+      freeWestDoor: () => freeWestDoor(game.state, game.ctx),
+      ending: (id) => {
+        input.reset();
+        touch.clear();
+        touch.show(false);
+        hud.show(false);
+        desktop.releaseLock();
+        panels.close();
+        showEnding(id);
+      },
       goOutside: () => {
         // Just outside the outer airlock door, facing the tether.
         player.x = -0.5;

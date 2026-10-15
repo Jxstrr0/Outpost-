@@ -89,10 +89,13 @@ export function createState(night, options = {}) {
     mastDuty: !!night.mastInspection, // tonight the north mast needs inspecting
     mastInspected: false,
     antennaIced: false,
+    // Night 5's west door: freed at 03:00, opened by the player, and how far into the
+    // white they have walked (0 to 1).
+    westDoor: { freed: false, opened: false, answer: 0, voiceIndex: 0, nextVoice: 0 },
 
     freezeMinutes: 0,
     lowestTemp: start.temp,
-    outcome: null, // null while playing, then 'survived' | 'frozen' | 'breakdown' | 'exposure'
+    outcome: null, // null while playing, then 'survived' | 'frozen' | 'breakdown' | 'exposure' | 'answered'
     flags: {},
   };
 }

@@ -11,7 +11,7 @@ export const HALLUCINATIONS = ['knocks', 'roofSteps', 'whisper', 'fakeStall', 'f
 /** Is the place the player is standing lit? */
 export function playerInLight(state) {
   if (state.room === 'main') return state.lightsLit;
-  if (state.room === 'outside') return false;
+  if (state.room === 'outside' || state.room === 'bunk') return false; // Vance's room has no working light
   return state.power > 0; // the plant rooms are on their own circuit
 }
 

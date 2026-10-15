@@ -14,13 +14,15 @@
   "flashlight": true,
   "newTonight": [
     "The north window can crack. Wind gets in and the cold comes twice as fast. Seal it with tape from the supply room: hold USE at the window.",
-    "Dispatch calls three times tonight. Listen carefully to who is calling."
+    "Dispatch calls three times tonight. Listen carefully to who is calling.",
+    "Vance's room, south of the main room, is taped shut. Hold USE at the door to cut the tape."
   ],
   "doors": {
     "supply": "closed",
     "airlockInner": "closed",
     "airlockSide": "closed",
-    "airlockOuter": "closed"
+    "airlockOuter": "closed",
+    "bunkRoom": "taped"
   },
   "failures": {
     "generatorStall": 1.35,
@@ -61,6 +63,10 @@
     {
       "id": "n07",
       "spot": "windowSill"
+    },
+    {
+      "id": "n08",
+      "spot": "vancePillow"
     }
   ],
   "radio": [
@@ -86,5 +92,10 @@
     "bedroll": true,
     "handprints": true,
     "lockerOpen": true
+  },
+  "tape": {
+    "id": "t4",
+    "spot": "vancePanel",
+    "turn": 1.2
   }
 }

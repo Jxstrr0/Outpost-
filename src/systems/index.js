@@ -11,6 +11,7 @@ import { updateSanity } from './sanity.js';
 import { updateFlashlight } from './flashlight.js';
 import { updateRadio } from './radio.js';
 import { updateWeather, updateBody } from './outside.js';
+import { updateWestDoor } from './westdoor.js';
 
 /** Game minutes simulated by one fixed tick. */
 export const TICK_MINUTES = CONFIG.time.gameMinutesPerSecond / CONFIG.time.ticksPerSecond;
@@ -33,6 +34,7 @@ export function stepSimulation(state, ctx, dt = TICK_MINUTES) {
   updateSanity(state, dt, ctx);
   updateWeather(state, dt, ctx);
   updateBody(state, dt, ctx);
+  updateWestDoor(state, dt, ctx);
 }
 
 /** Debug: set a meter directly. */
@@ -67,4 +69,5 @@ export * from './repairs.js';
 export * from './sanity.js';
 export * from './player.js';
 export * from './outside.js';
+export * from './westdoor.js';
 export { jumpTo } from './time.js';

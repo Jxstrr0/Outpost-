@@ -14,5 +14,14 @@
   "airlockOuter": {
     "name": "Outer door",
     "locked": "The outer door is frozen into its frame. Minus thirty out there, and nothing out there needs you tonight."
+  },
+  "bunkRoom": {
+    "name": "Vance's room",
+    "locked": "Vance's room, taped shut from this side. Dispatch says it stays sealed for the inquiry.",
+    "taped": "Taped shut from this side, three layers deep. Hold USE to cut through."
+  },
+  "west": {
+    "name": "West door",
+    "locked": "Frozen into its frame. Minus thirty out there, and nothing worth going out for."
   }
 }

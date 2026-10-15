@@ -5,7 +5,6 @@
 import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { createKit } from './kit.js';
-import { hitbox } from './rooms/builder.js';
 import { PALETTE as C } from './assets.js';
 import { YARD } from './layout.js';
 import * as P from './props.js';
@@ -131,16 +130,17 @@ function buildCladding(k) {
   claddingRun(k, 'x', 9, 0.86, 5.14, 1); // supply, south
   claddingRun(k, 'z', 1, 7.0, 9.14, -1); // supply, west
   claddingRun(k, 'x', 7, -2.14, 0.86, 1, [{ from: -1.05, to: 0.05, top: 2.15 }]); // airlock, south
-  claddingRun(k, 'z', -2, 5.0, 7.14, -1); // airlock, west
-  claddingRun(k, 'x', 5, -11.14, -2.14, 1); // main room, south
-  claddingRun(k, 'z', -11, -5.14, 5.14, -1); // west, with the west door drawn on
+  claddingRun(k, 'z', -2, 7.0, 8.14, 1); // Vance's room, the corner east of it
+  claddingRun(k, 'x', 8, -6.14, -1.86, 1); // Vance's room, south
+  claddingRun(k, 'z', -6, 5.0, 8.14, -1); // Vance's room, west
+  claddingRun(k, 'x', 5, -11.14, -6.14, 1); // main room, south
+  claddingRun(k, 'z', -11, -5.14, 5.14, -1, [{ from: -3.0, to: -1.8, top: 2.15 }]); // west, with the west door
 
-  // The west door from outside: a heavy leaf, iced into its frame.
-  k.at(-11.28, 0, -2.4, -Math.PI / 2, () => {
-    k.box(1.3, 2.25, 0.08, CLAD_DARK, 0, 1.12, 0);
-    k.at(-0.55, 0, 0, 0, () => P.doorLeaf(k, 1.1, 2.1, 0x46525a, { heavy: true }));
-    k.box(1.1, 0.12, 0.1, 0xdfe8ef, 0, 2.08, 0.06, { shade: 0 }); // ice on the head
-  });
+  // The west door's frame from outside, with ice on its head.
+  k.box(0.2, 2.3, 0.12, CLAD_DARK, -11.2, 1.15, -3.06);
+  k.box(0.2, 2.3, 0.12, CLAD_DARK, -11.2, 1.15, -1.74);
+  k.box(0.2, 0.14, 1.44, CLAD_DARK, -11.2, 2.22, -2.4);
+  k.box(0.12, 0.1, 1.2, 0xdfe8ef, -11.28, 2.12, -2.4, { shade: 0 }); // ice on the head
   // North window frame from outside.
   k.box(2.05, 0.12, 0.16, CLAD_DARK, -4.5, 2.12, -5.26);
   k.box(2.05, 0.12, 0.16, CLAD_DARK, -4.5, 0.98, -5.26);
@@ -339,9 +339,6 @@ export function buildExterior(b, scene) {
   const tagMesh = tags.bake(new THREE.MeshBasicMaterial({ vertexColors: true }));
   b.group.add(tagMesh);
   b.group.add(makeGround());
-
-  // The west door from outside, and the outer door's lamp.
-  b.interactable('westDoorOutside', hitbox(b.group, 0.4, 2.1, 1.1, -11.4, 1.05, -2.4));
 
   // The window glows from outside when the main room is lit.
   const windowGlow = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.0), new THREE.MeshBasicMaterial({ color: 0x0b0e12 }));

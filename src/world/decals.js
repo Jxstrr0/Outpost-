@@ -373,6 +373,26 @@ function drawAtlas() {
     g.lineTo(32 - 4, 32 + 18);
     g.stroke();
   });
+  // Vance's copy of Hollis's count: rows of three strokes, never four.
+  a.add('tally', 128, 160, (g, w, h) => {
+    g.fillStyle = '#ddd6c4';
+    g.fillRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(30, 30, 40, 0.8)';
+    g.lineWidth = 2;
+    for (let row = 0; row < 9; row++) {
+      for (let set = 0; set < 4; set++) {
+        if (row === 8 && set > 1) break;
+        for (let i = 0; i < 3; i++) {
+          const x = 12 + set * 28 + i * 6;
+          const y = 12 + row * 16;
+          g.beginPath();
+          g.moveTo(x, y);
+          g.lineTo(x + ((row + i) % 2), y + 11);
+          g.stroke();
+        }
+      }
+    }
+  });
   return a;
 }
 

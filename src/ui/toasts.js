@@ -52,6 +52,7 @@ export function bindToasts(events, toasts) {
   events.on('log:recovered', () => say('Keeper log entry recovered. Read it at the terminal.'));
   events.on('can:pickedUp', () => say('Jerry can. Take it to the generator.'));
   events.on('flavour', ({ text }) => say(text));
+  events.on('door:untaped', () => say("The tape comes away in long strips. Vance's door is just a door now."));
   events.on('flashlight:low', () => say('The flashlight is fading.', 'warn'));
   events.on('flashlight:dead', () => say('The flashlight dies. It recharges from station power while it is off.', 'warn'));
   events.on('flashlight:flat', () => say('The flashlight is flat. Leave it off while the station has power.', 'warn'));
@@ -83,6 +84,9 @@ export function bindToasts(events, toasts) {
   events.on('gust:start', ({ outside }) => {
     if (outside) say('A gust tears in off the ice. You can barely see the rope.', 'warn');
   });
+  events.on('westDoor:free', () => say('Ice cracks in the west door frame. Something on the other side is waiting.', 'warn'));
+  events.on('westDoor:voice', ({ text }) => say(`Vance's voice, outside the west door: "${text}"`, 'warn'));
+  events.on('westDoor:frozen', () => say('The west door freezes back into its frame. The voice has stopped.'));
   events.on('sanity:low', () => say('Your hands are shaking. Get somewhere lit and warm.', 'warn'));
   // A hallucinated fault looks exactly like the real thing on the HUD.
   events.on('sanity:hallucination', ({ kind }) => {

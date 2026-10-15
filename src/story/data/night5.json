@@ -13,13 +13,15 @@
   ],
   "flashlight": true,
   "newTonight": [
-    "Everything that can fail tonight will. Keep the lights on."
+    "Everything that can fail tonight will. Keep the lights on.",
+    "Whatever you hear tonight, the west door stays shut."
   ],
   "doors": {
     "supply": "closed",
     "airlockInner": "closed",
     "airlockSide": "closed",
-    "airlockOuter": "closed"
+    "airlockOuter": "closed",
+    "bunkRoom": "closed"
   },
   "failures": {
     "generatorStall": 1.5,
@@ -102,5 +104,17 @@
     "bedroll": true,
     "handprints": true,
     "lockerOpen": true
+  },
+  "westDoor": {
+    "opens": "03:00",
+    "closes": "04:00",
+    "voice": [
+      "Hey. It's me. It's Rob. Open up, I'm freezing out here.",
+      "I didn't go far. I've been by the mast the whole time. It's warm by the mast.",
+      "You've logged every reading. Come and see what they're for.",
+      "The helicopter's down by the light. Imogen sent it early. Come on.",
+      "Just for a minute. Just to be sure.",
+      "Please. I left the light on for you."
+    ]
   }
 }

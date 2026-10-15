@@ -11,6 +11,7 @@ import {
   pourCan,
   recordNote,
   recordTape,
+  cutTape,
   openReading,
   useDoor,
   nextSupply,
@@ -72,13 +73,12 @@ export function describeAction(entry, state) {
       return { label: state.tapesFound.includes(entry.data.tapeId) ? 'Play the tape again' : "Play the tape in Vance's recorder" };
     case 'mug':
       return { label: "Hollis's mug" };
-    case 'westDoor':
-      return { label: 'West door' };
     case 'door': {
       const id = entry.data.doorId;
       const name = DOORS[id]?.name ?? 'Door';
       const s = state.doors[id];
       if (s === 'locked') return { label: `${name}: locked` };
+      if (s === 'taped') return { label: `Hold to cut the tape on ${name}`, hold: true, holdSeconds: R.cutTapeSeconds };
       return { label: s === 'open' ? `Close the door` : `Open: ${name}` };
     }
     case 'supplies':
@@ -98,12 +98,14 @@ export function describeAction(entry, state) {
         return { label: 'Hold to check the instruments', hold: true, holdSeconds: R.inspectSeconds };
       }
       return { label: 'North mast', disabled: !state.mastInspected };
-    case 'westDoorOutside':
-      return { label: 'West door' };
     case 'bunk':
       return { label: 'Your bunk' };
     case 'recorderShelf':
       return { label: 'Recorder shelf' };
+    case 'vanceBunk':
+      return { label: "Vance's bunk" };
+    case 'vanceDesk':
+      return { label: "Vance's desk" };
     default:
       return null;
   }
@@ -155,10 +157,11 @@ export function performAction(entry, game) {
     case 'mug':
       if (entry.data.text) ctx.events.emit('flavour', { text: entry.data.text });
       break;
-    case 'westDoor':
-      ctx.events.emit('flavour', { text: 'Frozen into its frame. Minus thirty out there, and nothing worth going out for.' });
-      break;
     case 'door':
+      if (state.doors[entry.data.doorId] === 'taped') {
+        cutTape(state, ctx, entry.data.doorId);
+        break;
+      }
       if (state.doors[entry.data.doorId] === 'locked') {
         ctx.events.emit('flavour', { text: DOORS[entry.data.doorId]?.locked ?? 'Locked.' });
       }
@@ -183,14 +186,17 @@ export function performAction(entry, game) {
       else if (state.mastDuty && !state.mastInspected) inspectMast(state, ctx);
       else ctx.events.emit('flavour', { text: 'The instruments tick over. The north pressure gauge reads lower than it should.' });
       break;
-    case 'westDoorOutside':
-      ctx.events.emit('flavour', { text: 'The west door, from the wrong side. Ice has welded it into the frame.' });
-      break;
     case 'bunk':
       ctx.events.emit('flavour', { text: 'No sleeping on shift.' });
       break;
     case 'recorderShelf':
       ctx.events.emit('flavour', { text: 'An empty shelf, and a clean rectangle in the dust where a recorder sat.' });
+      break;
+    case 'vanceBunk':
+      ctx.events.emit('flavour', { text: "Vance's bunk, made with square corners. He made his bed before he went." });
+      break;
+    case 'vanceDesk':
+      ctx.events.emit('flavour', { text: 'Pages of north-minus-south figures. On the wall, Hollis\'s count copied out: three strokes a night, never four.' });
       break;
   }
 }

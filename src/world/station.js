@@ -11,6 +11,7 @@ import { buildMainRoom } from './rooms/main-room.js';
 import { buildGeneratorRoom, CAN_SLOTS, EMPTY_CAN_SPOTS } from './rooms/generator-room.js';
 import { buildSupplyRoom } from './rooms/supply-room.js';
 import { buildAirlock } from './rooms/airlock.js';
+import { buildBunkRoom } from './rooms/bunk-room.js';
 import { doorLeaf } from './props.js';
 import { createMetScreen, createTerminalScreen } from './screens.js';
 import { createLighting } from './lighting.js';
@@ -32,7 +33,7 @@ function makeCan() {
 /** A hinged door: a leaf on a pivot, an interaction box that swings with it, and a collider. */
 function makeDoor(b, id) {
   const o = DOORWAYS[id];
-  const heavy = id === 'airlockOuter';
+  const heavy = id === 'airlockOuter' || id === 'west';
   const w = o.to - o.from - 0.02;
   const h = o.top - 0.02;
   const hingeAt = o.hinge === 'from' ? o.from + 0.01 : o.to - 0.01;
@@ -94,6 +95,8 @@ export function buildStation(scene, camera, { getLogTitle }) {
   b.bakeRoom('supply');
   buildAirlock(b);
   b.bakeRoom('airlock');
+  buildBunkRoom(b);
+  b.bakeRoom('bunk');
   b.decals.bake(b.group);
   const exterior = buildExterior(b, scene);
   const { anchors } = b;
@@ -112,6 +115,21 @@ export function buildStation(scene, camera, { getLogTitle }) {
   crack.position.set(anchors.window.x, anchors.window.y, anchors.window.z + 0.035);
   crack.visible = false;
   b.group.add(crack);
+
+  // Tape across Vance's door, on the main room side, until it's cut.
+  const sealed = new THREE.Group();
+  {
+    const o = DOORWAYS.bunkRoom;
+    const w = o.to - o.from;
+    const len = Math.hypot(w, o.top) - 0.1;
+    const tilt = Math.atan2(o.top, w);
+    for (const s of [-1, 1]) {
+      const strip = box(sealed, len, 0.07, 0.008, mat(0xb8b090), (o.from + o.to) / 2, o.top / 2, o.fixed - ROOM.wall / 2 - 0.045);
+      strip.rotation.z = s * tilt;
+    }
+    for (const y of [0.5, 1.6]) box(sealed, w + 0.1, 0.07, 0.008, mat(0xb8b090), (o.from + o.to) / 2, y, o.fixed - ROOM.wall / 2 - 0.047);
+  }
+  b.group.add(sealed);
 
   // Generator status lamp
   const lamp = new THREE.Mesh(
@@ -203,6 +221,7 @@ export function buildStation(scene, camera, { getLogTitle }) {
       b.refs.heaterGrille.material.emissiveIntensity = lighting.heaterGlowLevel();
 
       crack.visible = state.windowCracked;
+      sealed.visible = state.doors.bunkRoom === 'locked' || state.doors.bunkRoom === 'taped';
       lever.rotation.z = state.breakerTripped ? 0.9 : 0;
       lever.position.y = anchors.breakerLever.y - (state.breakerTripped ? 0.12 : 0);
 
@@ -214,7 +233,7 @@ export function buildStation(scene, camera, { getLogTitle }) {
         door.pivot.rotation.y = door.base + door.angle;
         door.collider.off = s === 'open';
         const powered = state.power > 0;
-        door.lamp.material.color.setHex(!powered ? 0x101010 : s === 'locked' ? 0xd02818 : 0x30c050);
+        door.lamp.material.color.setHex(!powered ? 0x101010 : s === 'locked' || s === 'taped' ? 0xd02818 : 0x30c050);
       }
 
       // Cans
