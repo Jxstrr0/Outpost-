@@ -1,0 +1,12 @@
+{
+  "stall": "The generator coughs and dies",
+  "stallAlarm": "Generator alarm",
+  "fuelAlarm": "Low-fuel alarm",
+  "clunk": "A heavy clunk",
+  "relay": "The breaker panel buzzes",
+  "knocks": "Three knocks",
+  "roofSteps": "Footsteps cross the roof",
+  "anomaly": "Every light in the station stutters",
+  "groan": "Metal groans, somewhere out in the cold",
+  "beeps": "The met console beeps"
+}

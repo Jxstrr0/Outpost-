@@ -100,7 +100,32 @@ export const CONFIG = {
   audio: {
     windVolume: 0.32,
     generatorVolume: 0.55,
+    engineLayerVolume: 0.5, // the recorded engine loop under the generated hum
     heaterVolume: 0.22,
+    lightBuzzVolume: 0.05, // fluorescent hum from the ceiling fixtures
+    radioStaticVolume: 0.05, // the radio set's standby hiss
+    droneVolume: 0.35, // the low drone on the day summary screen
+    hrtf: true, // head-related panning: sounds have a clear left, right, front and back
+    refDistance: 1.6,
+    rolloff: 1.3,
+    // Walls muffle sound. Occlusion runs from 0 (same room) to 1 (behind closed walls).
+    occlusionByHops: [0, 0.3, 0.6], // through 0, 1 or 2 open doorways
+    clearCutoff: 18000, // low-pass cutoff in Hz with nothing in the way
+    occludedCutoff: 600,
+    occludedGain: 0.45,
+    reverbSend: 0.18, // how much of each sound goes into the room echo
+    reverbSeconds: 1.3,
+    // Failure tells repeat while the fault lasts, so the player can find them by ear.
+    stallAlarmEvery: 2.4, // seconds between generator alarm buzzes while stalled
+    fuelAlarmEvery: 3.5,
+    relayBuzzEvery: 3.2, // the tripped breaker panel's buzz
+    coolingSeconds: 45, // a stopped engine ticks as it cools
+    subtitleRepeatSeconds: 20, // a repeating tell is subtitled again this often
+    stepEvery: 0.8, // metres walked per footstep
+    stepVolume: 0.35,
+    creakEvery: [14, 40], // seconds between building creaks, min and max
+    groanEvery: [35, 80], // distant metal groans outside
+    groanDistance: 14, // metres from the station centre
   },
 
   lighting: {

@@ -85,10 +85,14 @@ const flashlight = createFlashlight(camera);
 const player = createPlayer(camera);
 const input = createInputState();
 const interactor = createInteractor(camera, station);
-const audio = createAudio(camera, scene, station.anchors, events);
 const hud = createHud(uiRoot);
 const toasts = createToasts(uiRoot);
-bindToasts(events, toasts, settings);
+bindToasts(events, toasts);
+const audio = createAudio(camera, scene, station.anchors, events, {
+  subtitle: (text) => {
+    if (settings().subtitles && (game.mode === 'playing' || game.mode === 'panel')) toasts.push(text, 'subtitle');
+  },
+});
 const menus = createMenus(uiRoot);
 
 const params = new URLSearchParams(window.location.search);
@@ -144,6 +148,7 @@ function nightContext(night) {
 
 function showTitle() {
   game.mode = 'title';
+  audio.setDrone(false);
   hud.show(false);
   touch.show(false);
   debug?.show(false);
@@ -198,6 +203,7 @@ function beginNight(number) {
   updateSave({ currentNight: night.night });
 
   game.mode = 'card';
+  audio.setDrone(false);
   hud.show(false);
   touch.show(false);
   debug?.show(true);
@@ -268,6 +274,7 @@ function handleOutcome() {
 
   if (state.outcome === 'survived') {
     game.mode = 'summary';
+    audio.setDrone(true);
     const nextNight = night.night < LAST_NIGHT ? night.night + 1 : null;
     updateSave({ highestNight: Math.max(getSave().highestNight, nextNight || night.night) });
     menus.summary({
@@ -300,6 +307,9 @@ document.addEventListener('visibilitychange', () => {
 
 // ---------- Debug (?debug=1) ----------
 
+/** Debug sound tests, and where each one plays from, so direction and muffling can be checked. */
+const SOUND_SPOTS = { alarm: 'generator', tick: 'generator', relay: 'breaker', groan: 'outside', creak: 'roof', glassTick: 'window', pop: 'heater' };
+
 const debug = isDebug()
   ? createDebugPanel(uiRoot, {
       failureIds: FAILURE_IDS,
@@ -311,6 +321,11 @@ const debug = isDebug()
       setMeter: (k, v) => setMeter(game.state, k, v),
       trigger: (id) => triggerFailure(game.state, game.ctx, id),
       scripted: (id) => events.emit(`scripted:${id}`),
+      soundSpots: SOUND_SPOTS,
+      sound: (id) => {
+        audio.start(settings());
+        audio.play(id, SOUND_SPOTS[id]);
+      },
       jumpNight: (n) => {
         audio.start(settings());
         beginNight(n);
@@ -338,7 +353,7 @@ const debug = isDebug()
   : null;
 debug?.show(false);
 // Lets automated browser tests inspect and steer a debug session.
-if (debug) window.__outpost = { game, player, station, renderer, scene, camera };
+if (debug) window.__outpost = { game, player, station, renderer, scene, camera, audio };
 
 // ---------- Main loop ----------
 

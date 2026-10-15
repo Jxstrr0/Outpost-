@@ -21,6 +21,7 @@ export function createDebugPanel(root, api) {
   panel.open = false;
   const failures = api.failureIds.map((id) => `<button data-fail="${id}">${id}</button>`).join('');
   const scripted = api.scriptedIds.map((id) => `<button data-script="${id}">${id}</button>`).join('');
+  const sounds = Object.keys(api.soundSpots || {}).map((id) => `<button data-sound="${id}">${id}</button>`).join('');
   const nights = api.nightNumbers.map((n) => `<button data-night="${n}">N${n}</button>`).join('');
   panel.innerHTML = `
     <summary>DEBUG <span data-info></span></summary>
@@ -42,6 +43,7 @@ export function createDebugPanel(root, api) {
       <div class="dbg-row"><label>torch</label><input type="range" min="0" max="100" data-meter="battery" /></div>
       <div class="dbg-row">fail ${failures}</div>
       <div class="dbg-row">event ${scripted}</div>
+      <div class="dbg-row">sound ${sounds}</div>
       <div class="dbg-row">night ${nights}</div>
       <div class="dbg-row">
         <button data-end="survived">survive</button>
@@ -63,6 +65,7 @@ export function createDebugPanel(root, api) {
   );
   panel.querySelectorAll('[data-fail]').forEach((b) => b.addEventListener('click', () => api.trigger(b.dataset.fail)));
   panel.querySelectorAll('[data-script]').forEach((b) => b.addEventListener('click', () => api.scripted(b.dataset.script)));
+  panel.querySelectorAll('[data-sound]').forEach((b) => b.addEventListener('click', () => api.sound(b.dataset.sound)));
   panel.querySelectorAll('[data-night]').forEach((b) => b.addEventListener('click', () => api.jumpNight(Number(b.dataset.night))));
   panel.querySelectorAll('[data-end]').forEach((b) => b.addEventListener('click', () => api.end(b.dataset.end)));
   q('[data-nofail]').addEventListener('click', (e) => {
