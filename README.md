@@ -17,6 +17,15 @@ You are the lone keeper of an arctic weather station for five nights. Keep the g
 | Flashlight (night 2 on) | TORCH button, above USE | F |
 | Pause | II button, top centre | Esc |
 
+## Save codes (moving your progress)
+
+Progress is saved in the browser you play in. To carry it to another phone or browser, or keep a backup:
+
+1. On the title screen (or the pause menu, II), under **Save code**, tap **Back up**, then **Copy code**. Paste it somewhere safe, like your notes app or a message to yourself. The code starts with `OP1:`.
+2. On the other phone or browser, open the game and tap **Restore** under **Save code**, paste the code and tap **Restore**. It shows what's in the code next to what's saved there now, and asks before replacing anything.
+
+The code holds your nights, supply choices, logs and notes found, and settings. A night you're in the middle of isn't included, because the game saves between nights. Nothing is sent anywhere: the code is made and read inside the page. A damaged or cut-short code is turned down with a message and changes nothing. How it works is in `src/core/savecode.js`.
+
 ## Where things are
 
 - `docs/DESIGN.md`: the full design and the decisions log. Start here.

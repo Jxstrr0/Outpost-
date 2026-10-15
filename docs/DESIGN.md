@@ -243,7 +243,7 @@ outpost/
   src/
     main.js                 boot, renderer, main loop
     config.js               every tuning number in one place
-    core/                   state.js, events.js, rng.js, save.js, debug.js
+    core/                   state.js, events.js, rng.js, save.js, savecode.js, debug.js
     world/                  station.js, rooms/, exterior.js, lighting.js, assets.js
     player/                 controller.js, input-desktop.js, input-touch.js, interact.js
     systems/                time.js, power.js, fuel.js, heat.js, sanity.js, failures.js, duties.js
@@ -267,6 +267,8 @@ outpost/
 ### Save data
 
 One localStorage key, `outpost.save.v1`, storing: highest night reached, supply choices, logs and notes found, ending(s) seen, and settings. A night in progress is not saved; quitting restarts the night.
+
+**Save codes** (`core/savecode.js`) move that save between browsers and phones with no server. Back up (title screen or pause menu, under "Save code") shows the whole save as one line of text starting `OP1:`, with a Copy button. Restore takes a pasted code, shows what's in it next to what's saved now, asks before replacing anything, then writes the whole save in one go. The code is the save as JSON in base64url (letters, digits, `-` and `_`, so chat apps leave it alone) plus a 6-character checksum, so a code with a missing or changed character is turned down with a plain message instead of half-loading. Codes from another game, from a newer version (`OP2:`, or a save version above 1) or with a field of the wrong type are turned down the same way. Fields missing from an older code get their defaults. A code is about 350 to 900 characters, small enough not to need compression.
 
 ### Performance budget
 
@@ -492,3 +494,4 @@ Decisions made after the doc was written. They take precedence over anything abo
 | 2026-10-15 | Antenna icing (nights 3 to 5) turns the radio and the met console to static until the player knocks the ice off the mast antenna (3 s hold). |
 | 2026-10-15 | Night 3's scripted moment is now the second set of footprints: they appear beside the player's trail once the mast has been checked, and carry on north past the fence. Night 3's 03:00 anomaly moment is gone. |
 | 2026-10-15 | Outdoor surfaces ignore the station's point lights so interior lights never shine through walls onto the snow; outside, the light comes from the moon, the window glow, the door lamp, the mast beacon and the flashlight. |
+| 2026-10-15 | Save codes added at the owner's request, `OP1:` prefix, local only: the code is made and read in the page, nothing is sent anywhere. It carries the whole save, settings included. Back up and Restore sit under "Save code" on the title screen and the pause menu. |

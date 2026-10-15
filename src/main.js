@@ -7,7 +7,8 @@ import { CONFIG } from './config.js';
 import { events } from './core/events.js';
 import { createRng, nightSeed } from './core/rng.js';
 import { createState } from './core/state.js';
-import { loadSave, getSave, updateSave, updateSettings, resetCampaign, rememberFound } from './core/save.js';
+import { loadSave, getSave, updateSave, updateSettings, resetCampaign, rememberFound, restoreSave } from './core/save.js';
+import { makeSaveCode, readSaveCode, describeSave } from './core/savecode.js';
 import { isDebug, createDebugPanel } from './core/debug.js';
 import {
   stepSimulation,
@@ -188,6 +189,8 @@ function showTitle() {
       beginNight(getSave().currentNight);
     },
     onSettings: () => openSettings(showTitle),
+    onBackup: () => openBackup(showTitle),
+    onRestore: () => openRestore(showTitle),
   });
 }
 
@@ -200,6 +203,29 @@ function openSettings(back) {
     },
     back
   );
+}
+
+// Save codes: back up all progress as text, or restore it from a code (see core/savecode.js).
+// From the pause menu the night in progress isn't in the code, and restoring ends it.
+
+function openBackup(back) {
+  menus.backup({ code: makeSaveCode(getSave()), midNight: game.mode === 'paused', onBack: back });
+}
+
+function openRestore(back) {
+  menus.restore({
+    read: readSaveCode,
+    describe: describeSave,
+    current: getSave(),
+    midNight: game.mode === 'paused',
+    onRestore: (save) => {
+      const stored = restoreSave(save);
+      applySettings();
+      return stored;
+    },
+    onDone: showTitle,
+    onBack: back,
+  });
 }
 
 function beginNight(number) {
@@ -255,6 +281,8 @@ function showPauseMenu() {
     onSettings: () => openSettings(showPauseMenu),
     onRestart: () => beginNight(game.state.night),
     onQuit: showTitle,
+    onBackup: () => openBackup(showPauseMenu),
+    onRestore: () => openRestore(showPauseMenu),
   });
 }
 
