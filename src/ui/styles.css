@@ -791,8 +791,8 @@ h2 {
 
 .debug {
   position: absolute;
-  left: calc(14px + var(--safe-left));
-  top: calc(120px + var(--safe-top));
+  right: calc(14px + var(--safe-right));
+  top: calc(84px + var(--safe-top));
   pointer-events: auto;
   background: rgba(0, 0, 0, 0.82);
   border: 1px solid #3c4a20;
