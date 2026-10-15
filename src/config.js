@@ -86,6 +86,10 @@ export const CONFIG = {
     fogNear: 4,
     fogFar: 26,
     screenRefreshPerSecond: 6,
+    kit: {
+      shade: 0.22, // how much darker the bottom of each prop part is than its top
+      colorJitter: 0.05, // brightness wobble between repeated parts
+    },
   },
 
   ui: {
@@ -100,11 +104,26 @@ export const CONFIG = {
   },
 
   lighting: {
-    fixtureIntensity: 7,
+    ambient: 0.55, // hemisphere light while the main room is lit
+    ambientDark: 0.32, // during a blackout or with the lights switched off
+    moonIntensity: 0.3,
+    decay: 1.3,
+    lightHeight: 2.2, // point lights hang below their fixtures
+    mainIntensity: 11, // one light between the main room's two fixtures
+    mainDistance: 13,
     generatorRoomIntensity: 5,
+    generatorRoomDistance: 9,
+    smallRoomIntensity: 3.2, // shared by the supply room and the airlock
+    smallRoomDistance: 6.5,
+    emergencyLevel: 0.18, // red emergency light, as a fraction of the main light
     blackoutScreenBrightness: 0.15,
     emergencyPulseSeconds: 1.8,
     anomalyStutterSeconds: 1.2,
     anomalyDarkSeconds: 2,
+  },
+
+  doors: {
+    swingSpeed: 6, // how fast a door leaf follows its open/closed state (per second)
+    openAngle: 1.62, // radians a door swings when open
   },
 };

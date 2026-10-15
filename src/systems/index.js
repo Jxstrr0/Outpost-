@@ -50,4 +50,5 @@ export * from './power.js';
 export * from './fuel.js';
 export * from './failures.js';
 export * from './duties.js';
+export * from './doors.js';
 export { jumpTo } from './time.js';

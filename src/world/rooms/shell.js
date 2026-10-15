@@ -1,8 +1,10 @@
-// The building shell: floor, ceiling and walls for the main and generator rooms.
-// Main room x -11..0, generator room x 0..5, both z -5..5. North is -z.
+// The building shell: floors, ceiling and walls for every room.
+// North is -z. Main room x -11..0, generator room x 0..5 (both z -5..5),
+// supply room x 1..5 z 5..9, airlock x -2..1 z 5..7.
+// The loop: main → generator → supply → airlock → main.
 
 import * as THREE from 'three';
-import { PALETTE, mat, box, makeFloorTexture } from '../assets.js';
+import { PALETTE, makeFloorTexture, makeLinoleumTexture, makeCeilingTexture } from '../assets.js';
 
 export const ROOM = {
   height: 2.8,
@@ -10,71 +12,156 @@ export const ROOM = {
   minX: -11,
   maxX: 5,
   minZ: -5,
-  maxZ: 5,
+  maxZ: 9,
   dividerX: 0,
   doorway: { minZ: 1.4, maxZ: 2.6, top: 2.15 },
 };
 
-export function buildShell(b) {
+/** Door openings, shared with the door builder. `axis` is the wall's run direction. */
+export const DOORWAYS = {
+  airlockInner: { axis: 'x', fixed: 5, from: -1.45, to: -0.35, top: 2.1, hinge: 'from', swing: -1 },
+  supply: { axis: 'x', fixed: 5, from: 3.7, to: 4.7, top: 2.1, hinge: 'to', swing: 1 },
+  airlockSide: { axis: 'z', fixed: 1, from: 5.5, to: 6.5, top: 2.1, hinge: 'to', swing: 1 },
+  airlockOuter: { axis: 'x', fixed: 7, from: -1.0, to: 0.0, top: 2.1, hinge: 'from', swing: 1 },
+};
+
+/** Room surface colours: [wall, lower band]. */
+const SKIN = {
+  main: [PALETTE.wallMain, PALETTE.wallMainLow],
+  gen: [PALETTE.wall, PALETTE.wallLow],
+  supply: [PALETTE.wallSupply, PALETTE.wallSupplyLow],
+  airlock: [PALETTE.wallAirlock, PALETTE.wallAirlockLow],
+};
+
+const dw = (id) => ({ from: DOORWAYS[id].from, to: DOORWAYS[id].to, top: DOORWAYS[id].top });
+
+// [axis, fixed, from, to, roomOnNegativeSide, roomOnPositiveSide, openings]
+// axis 'x': the wall runs along x at z = fixed. axis 'z': runs along z at x = fixed.
+const WALLS = [
+  ['x', -5, -11, 0, null, 'main'],
+  ['x', -5, 0, 5, null, 'gen'],
+  ['x', 5, -11, -2, 'main', null],
+  ['x', 5, -2, 0, 'main', 'airlock', [dw('airlockInner')]],
+  ['x', 5, 0, 1, 'gen', 'airlock'],
+  ['x', 5, 1, 5, 'gen', 'supply', [dw('supply')]],
+  ['x', 7, -2, 1, 'airlock', null, [dw('airlockOuter')]],
+  ['x', 9, 1, 5, 'supply', null],
+  ['z', -11, -5, 5, null, 'main'],
+  ['z', 0, -5, 5, 'main', 'gen', [{ from: 1.4, to: 2.6, top: 2.15 }]],
+  ['z', 5, -5, 5, 'gen', null],
+  ['z', 5, 5, 9, 'supply', null],
+  ['z', -2, 5, 7, null, 'airlock'],
+  ['z', 1, 5, 7, 'airlock', 'supply', [dw('airlockSide')]],
+  ['z', 1, 7, 9, null, 'supply'],
+];
+
+/**
+ * Draw one straight wall with its openings. Each wall is two half-thickness skins so the
+ * rooms on either side can be painted differently.
+ */
+function buildWall(b, [axis, fixed, from, to, negRoom, posRoom, openings = []]) {
+  const { kit } = b;
   const { height: H, wall: T } = ROOM;
-  const g = b.group;
+  const along = axis === 'x';
+  // Place a box given its extent along the wall, its offset across it, and its size.
+  const put = (a0, a1, y, h, across, thick, hex) => {
+    const len = a1 - a0;
+    const mid = (a0 + a1) / 2;
+    if (along) kit.box(len, h, thick, hex, mid, y, fixed + across);
+    else kit.box(thick, h, len, hex, fixed + across, y, mid);
+  };
 
-  const floorTex = makeFloorTexture('#33373a');
-  floorTex.repeat.set(8, 5);
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 10), new THREE.MeshLambertMaterial({ map: floorTex }));
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.set(-3, 0, 0);
-  g.add(floor);
+  // Solid spans between openings, extended at the ends so corners close.
+  const cuts = [...openings].sort((p, q) => p.from - q.from);
+  const spans = [];
+  let cursor = from - T / 2;
+  for (const o of cuts) {
+    spans.push([cursor, o.from]);
+    cursor = o.to;
+  }
+  spans.push([cursor, to + T / 2]);
 
-  // A worn rug under the main-room table, so the main room reads warmer than the plant room.
-  const rug = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.4), mat(0x4a3b2c));
-  rug.rotation.x = -Math.PI / 2;
-  rug.position.set(-3.3, 0.005, -0.9);
-  g.add(rug);
-
-  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(16, 10), mat(PALETTE.ceiling));
-  ceiling.rotation.x = Math.PI / 2;
-  ceiling.position.set(-3, H, 0);
-  g.add(ceiling);
-
-  const wallMat = mat(PALETTE.wall);
-  const lowMat = mat(PALETTE.wallLow);
-
-  // Outer walls, each with a darker lower band.
-  const walls = [
-    // [w, d, x, z]
-    [16 + 2 * T, T, -3, ROOM.minZ - T / 2], // north
-    [16 + 2 * T, T, -3, ROOM.maxZ + T / 2], // south
-    [T, 10, ROOM.minX - T / 2, 0], // west
-    [T, 10, ROOM.maxX + T / 2, 0], // east
+  const sides = [
+    [negRoom, -T / 4, -1],
+    [posRoom, T / 4, 1],
   ];
-  for (const [w, d, x, z] of walls) {
-    b.solid(box(g, w, H, d, wallMat, x, H / 2, z));
-    const inset = 0.01;
-    const bw = w > d ? w : w + inset * 2;
-    const bd = d > w ? d : d + inset * 2;
-    box(g, bw, 0.9, bd, lowMat, x, 0.45, z);
+  const bandH = 0.9;
+
+  for (const [a0, a1] of spans) {
+    if (a1 - a0 < 0.01) continue;
+    for (const [room, across, sign] of sides) {
+      const [wallHex, lowHex] = SKIN[room] || SKIN.gen;
+      put(a0, a1, H / 2, H, across, T / 2, wallHex);
+      if (!room) continue;
+      put(a0, a1, bandH / 2, bandH, across + sign * 0.006, T / 2, lowHex);
+      put(a0, a1, bandH + 0.025, 0.05, across + sign * 0.015, T / 2, PALETTE.trim);
+      put(a0, a1, 0.05, 0.1, across + sign * 0.012, T / 2, PALETTE.baseboard);
+      // Prefab panel seams.
+      for (let s = Math.ceil(a0 / 1.25) * 1.25; s < a1 - 0.1; s += 1.25) {
+        if (s - a0 < 0.1) continue;
+        put(s - 0.02, s + 0.02, H / 2, H, across + sign * 0.008, T / 2, PALETTE.seam);
+      }
+      put(a0, a1, H - 0.04, 0.08, across + sign * 0.01, T / 2, PALETTE.trim); // crown
+    }
+    if (along) b.block(a0, a1, fixed - T / 2, fixed + T / 2, H);
+    else b.block(fixed - T / 2, fixed + T / 2, a0, a1, H);
   }
 
-  // Divider wall with a doorway between the rooms.
-  const { minZ: dz0, maxZ: dz1, top } = ROOM.doorway;
-  b.solid(box(g, T, H, dz0 - ROOM.minZ, wallMat, 0, H / 2, (ROOM.minZ + dz0) / 2));
-  b.solid(box(g, T, H, ROOM.maxZ - dz1, wallMat, 0, H / 2, (dz1 + ROOM.maxZ) / 2));
-  box(g, T, H - top, dz1 - dz0, wallMat, 0, (H + top) / 2, (dz0 + dz1) / 2);
-  box(g, T + 0.02, 0.9, dz0 - ROOM.minZ, lowMat, 0, 0.45, (ROOM.minZ + dz0) / 2);
-  box(g, T + 0.02, 0.9, ROOM.maxZ - dz1, lowMat, 0, 0.45, (dz1 + ROOM.maxZ) / 2);
-  // Door frame trim
-  const trim = mat(PALETTE.steelDark);
-  box(g, T + 0.06, 0.08, dz1 - dz0 + 0.16, trim, 0, top + 0.04, (dz0 + dz1) / 2);
-  box(g, T + 0.06, top, 0.08, trim, 0, top / 2, dz0 - 0.04);
-  box(g, T + 0.06, top, 0.08, trim, 0, top / 2, dz1 + 0.04);
-
-  // Exposed pipes along the ceiling, for a bit of industrial texture.
-  const pipe = mat(PALETTE.steelDark);
-  for (const z of [-4.6, 4.6]) {
-    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 16, 8), pipe);
-    p.rotation.z = Math.PI / 2;
-    p.position.set(-3, H - 0.18, z);
-    g.add(p);
+  // Lintels and frames over each opening.
+  for (const o of cuts) {
+    for (const [room, across] of sides) {
+      const [wallHex] = SKIN[room] || SKIN.gen;
+      put(o.from, o.to, (H + o.top) / 2, H - o.top, across, T / 2, wallHex);
+    }
+    put(o.from - 0.05, o.from, o.top / 2, o.top, 0, T + 0.07, PALETTE.frame);
+    put(o.to, o.to + 0.05, o.top / 2, o.top, 0, T + 0.07, PALETTE.frame);
+    put(o.from - 0.05, o.to + 0.05, o.top + 0.04, 0.08, 0, T + 0.07, PALETTE.frame);
+    put(o.from, o.to, 0.012, 0.024, 0, T, PALETTE.steelDark); // threshold plate
+    // A short wall over the opening also stops interaction rays.
+    const occ = along
+      ? b.block(o.from, o.to, fixed - T / 2, fixed + T / 2, H - o.top, o.top)
+      : b.block(fixed - T / 2, fixed + T / 2, o.from, o.to, H - o.top, o.top);
+    occ.collider.off = true; // you can walk under a lintel
   }
+}
+
+function floorPlane(group, material, minX, maxX, minZ, maxZ) {
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(maxX - minX, maxZ - minZ), material);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set((minX + maxX) / 2, 0, (minZ + maxZ) / 2);
+  mesh.receiveShadow = true;
+  group.add(mesh);
+  return mesh;
+}
+
+export function buildShell(b) {
+  const { group } = b;
+  const H = ROOM.height;
+
+  // Floors: linoleum in the living space, tread plate in the plant rooms.
+  const lino = makeLinoleumTexture();
+  lino.repeat.set(5.5, 5);
+  floorPlane(group, new THREE.MeshLambertMaterial({ map: lino }), -11, 0, -5, 5);
+  const tread = makeFloorTexture('#33373a');
+  tread.repeat.set(2.5, 7);
+  const treadMat = new THREE.MeshLambertMaterial({ map: tread });
+  floorPlane(group, treadMat, 0, 5, -5, 9);
+  floorPlane(group, treadMat, -2, 0, 5, 7);
+
+  const tiles = makeCeilingTexture();
+  tiles.repeat.set(8, 7);
+  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(16, 14), new THREE.MeshLambertMaterial({ map: tiles }));
+  ceiling.rotation.x = Math.PI / 2;
+  ceiling.position.set(-3, H, 2);
+  group.add(ceiling);
+
+  for (const w of WALLS) buildWall(b, w);
+
+  // Services along the ceiling: two pipes and a cable tray, for industrial texture.
+  const { kit } = b;
+  for (const z of [-4.62, -4.48]) kit.cyl(0.045, 16, PALETTE.pipe, -3, H - 0.16, z, { rz: Math.PI / 2, seg: 8, shade: 0 });
+  for (let x = -10.5; x < 5; x += 1.5) kit.box(0.04, 0.14, 0.3, PALETTE.steelDark, x, H - 0.1, -4.55, { shade: 0 });
+  kit.box(10.6, 0.04, 0.3, PALETTE.steelDark, -5.5, H - 0.28, 4.62, { shade: 0 }); // cable tray, main room
+  kit.box(10.6, 0.06, 0.2, PALETTE.cable, -5.5, H - 0.24, 4.62, { shade: 0 });
+  kit.cyl(0.06, 13.8, PALETTE.pipe, 4.75, H - 0.2, 2, { rx: Math.PI / 2, seg: 8, shade: 0 }); // generator room run
 }

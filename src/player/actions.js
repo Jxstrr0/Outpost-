@@ -11,7 +11,9 @@ import {
   pourCan,
   recordNote,
   openReading,
+  useDoor,
 } from '../systems/index.js';
+import DOORS from '../story/data/doors.json';
 
 /** @returns {{ label: string, disabled?: boolean, hold?: boolean } | null} */
 export function describeAction(entry, state) {
@@ -45,8 +47,17 @@ export function describeAction(entry, state) {
       return { label: 'Read the note' };
     case 'westDoor':
       return { label: 'West door' };
-    case 'supplyDoor':
-      return { label: 'Supply room' };
+    case 'door': {
+      const id = entry.data.doorId;
+      const name = DOORS[id]?.name ?? 'Door';
+      const s = state.doors[id];
+      if (s === 'locked') return { label: `${name}: locked` };
+      return { label: s === 'open' ? `Close the door` : `Open: ${name}` };
+    }
+    case 'supplies':
+      return { label: 'Check the supplies' };
+    case 'radio':
+      return { label: 'Radio set' };
     case 'bunk':
       return { label: 'Your bunk' };
     case 'recorderShelf':
@@ -93,8 +104,21 @@ export function performAction(entry, game) {
     case 'westDoor':
       ctx.events.emit('flavour', { text: 'Frozen into its frame. Minus thirty out there, and nothing worth going out for.' });
       break;
-    case 'supplyDoor':
-      ctx.events.emit('flavour', { text: 'Supply room. The lock has iced over.' });
+    case 'door':
+      if (state.doors[entry.data.doorId] === 'locked') {
+        ctx.events.emit('flavour', { text: DOORS[entry.data.doorId]?.locked ?? 'Locked.' });
+      }
+      useDoor(state, ctx, entry.data.doorId);
+      break;
+    case 'supplies': {
+      const inv = state.inventory;
+      ctx.events.emit('flavour', {
+        text: `Spare fuses: ${inv.fuses}. Rations: ${inv.food}. Flashlight cells: ${inv.batteries}. Seal tape, a heat gun, filters.`,
+      });
+      break;
+    }
+    case 'radio':
+      ctx.events.emit('flavour', { text: 'The radio set hums on standby. Nothing on the channel tonight.' });
       break;
     case 'bunk':
       ctx.events.emit('flavour', { text: 'No sleeping on shift.' });

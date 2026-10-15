@@ -1,10 +1,11 @@
 {
   "night": 2,
   "title": "Night 2",
-  "intro": "The tracks were gone by noon. Two cans came up with the morning supplies.",
+  "intro": "The tracks were gone by noon. Two cans came up with the morning supplies, and the key to the supply room.",
   "start": { "power": 64, "fuel": 26, "temp": 6 },
   "jerryCans": 2,
   "systems": [],
+  "doors": { "supply": "closed", "airlockInner": "closed", "airlockSide": "closed" },
   "failures": { "generatorStall": 1.25, "breakerTrip": 1.2 },
   "readings": [
     { "time": "20:00" },

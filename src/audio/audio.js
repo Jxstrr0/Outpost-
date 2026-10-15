@@ -79,6 +79,8 @@ export function createAudio(camera, scene, anchors, events) {
       makeEmitter('roof', anchors.roof, 2.5);
       makeEmitter('window', anchors.window, 2);
       makeEmitter('cans', anchors.cans, 1.2);
+      makeEmitter('door', anchors['door-supply'], 1.6);
+      makeEmitter('radio', anchors.radio, 1.2);
       makeEmitter('player', new THREE.Vector3(), 3);
       camera.add(emitters.player.holder);
       emitters.player.holder.position.set(0, 0, -0.3);
@@ -173,6 +175,14 @@ export function createAudio(camera, scene, anchors, events) {
   events.on('reading:logged', () => play('confirm', 'console'));
   events.on('note:found', () => play('rustle', 'player'));
   events.on('can:pickedUp', () => play('lift', 'player'));
+  const atDoor = (id, sound) => {
+    if (!ctx || !anchors[`door-${id}`]) return;
+    emitters.door.holder.position.copy(anchors[`door-${id}`]);
+    play(sound, 'door');
+  };
+  events.on('door:opened', ({ id }) => atDoor(id, 'creak'));
+  events.on('door:closed', ({ id }) => atDoor(id, 'click'));
+  events.on('door:locked', ({ id }) => atDoor(id, 'click'));
   events.on('scripted:knocks', () => play('knocks', 'westDoor'));
   events.on('scripted:roofSteps', () => audio.roofSteps());
   events.on('scripted:anomaly', () => play('drone', 'player'));
