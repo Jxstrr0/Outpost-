@@ -728,6 +728,103 @@ h2 {
   border-radius: 4px;
 }
 
+/* Save codes */
+
+.menu-caption {
+  margin-top: 8px;
+  color: var(--ink-dim);
+  font-size: 0.72em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.menu-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.code-help {
+  margin: 0 0 14px;
+  max-width: 540px;
+  font-size: 0.85em;
+  line-height: 1.55;
+}
+
+.code-help.warn {
+  color: var(--amber);
+}
+
+.code-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink-dim);
+  font-size: 0.72em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.code-box {
+  display: block;
+  width: 100%;
+  min-height: 7em;
+  max-height: 40vh;
+  padding: 10px 12px;
+  resize: vertical;
+  font-family: var(--font);
+  font-size: max(16px, 0.9em); /* 16px or more, so iPhones don't zoom in when it's tapped */
+  line-height: 1.4;
+  color: var(--ink);
+  background: #0d1216;
+  border: 1px solid var(--panel-edge);
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  /* The rest of the game blocks text selection and scrolling; the code box needs both. */
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+  touch-action: auto;
+}
+
+.code-box:focus-visible {
+  outline: none;
+  border-color: var(--orange);
+}
+
+.code-box::placeholder {
+  color: var(--ink-faint);
+}
+
+.code-msg {
+  min-height: 1.45em;
+  margin-top: 8px;
+  font-size: 0.85em;
+  line-height: 1.45;
+  color: var(--green);
+}
+
+.code-msg.error {
+  color: var(--danger);
+}
+
+.code-compare {
+  margin: 0 0 14px;
+  font-size: 0.9em;
+  line-height: 1.45;
+}
+
+.code-compare dt {
+  color: var(--ink-dim);
+  font-size: 0.8em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.code-compare dd {
+  margin: 2px 0 12px;
+}
+
 /* Summary */
 
 .summary-stats {
@@ -870,6 +967,17 @@ h2 {
   }
   .title-sub {
     margin-bottom: 14px;
+  }
+  /* Phones held sideways: keep the save code box short so Copy and Restore stay on screen. */
+  .code-help {
+    margin-bottom: 8px;
+  }
+  .code-box {
+    min-height: 0;
+    height: 4.4em;
+  }
+  .code-msg + .fineprint {
+    margin-top: 4px;
   }
 }
 

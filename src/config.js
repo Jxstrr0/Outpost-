@@ -142,6 +142,11 @@ export const CONFIG = {
     maxToasts: 3,
   },
 
+  saveCode: {
+    checksumChars: 6, // characters at the end of a save code that catch damaged pastes
+    maxPasteChars: 20000, // anything longer than this can't be a real code
+  },
+
   audio: {
     windVolume: 0.32,
     generatorVolume: 0.55,
