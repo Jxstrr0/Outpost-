@@ -9,6 +9,7 @@ import night4 from './data/night4.json';
 import night5 from './data/night5.json';
 import logs from './data/logs.json';
 import notes from './data/notes.json';
+import tapes from './data/tapes.json';
 import supplies from './data/supplies.json';
 
 const NIGHT_FILES = { night1, night2, night3, night4, night5 };
@@ -16,6 +17,7 @@ const NIGHT_FILES = { night1, night2, night3, night4, night5 };
 export const NIGHTS = nightsIndex.order.map((key) => NIGHT_FILES[key]);
 export const LOGS = logs;
 export const NOTES = notes;
+export const TAPES = tapes;
 export const SUPPLIES = supplies;
 export const LAST_NIGHT = NIGHTS.length;
 

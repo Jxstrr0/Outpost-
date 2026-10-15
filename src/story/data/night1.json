@@ -2,21 +2,64 @@
   "night": 1,
   "title": "Night 1",
   "intro": "Station Kestrel-4. Keep the generator running, keep the heater on, and log the weather every two hours.",
-  "start": { "power": 68, "fuel": 30, "temp": 7 },
+  "start": {
+    "power": 68,
+    "fuel": 30,
+    "temp": 7
+  },
   "jerryCans": 3,
   "systems": [],
-  "failures": { "generatorStall": 1, "breakerTrip": 1 },
+  "failures": {
+    "generatorStall": 1,
+    "breakerTrip": 1
+  },
   "readings": [
-    { "time": "20:00" },
-    { "time": "22:00" },
-    { "time": "00:00" },
-    { "time": "02:00", "anomaly": true },
-    { "time": "04:00" }
+    {
+      "time": "20:00"
+    },
+    {
+      "time": "22:00"
+    },
+    {
+      "time": "00:00"
+    },
+    {
+      "time": "02:00",
+      "anomaly": true
+    },
+    {
+      "time": "04:00"
+    }
   ],
-  "logs": ["v01", "v02", "v03", "v04", "v05"],
+  "logs": [
+    "v01",
+    "v02",
+    "v03",
+    "v04",
+    "v05"
+  ],
   "notes": [
-    { "id": "n01", "spot": "jerrycans" },
-    { "id": "n02", "spot": "table" }
+    {
+      "id": "n01",
+      "spot": "jerrycans"
+    },
+    {
+      "id": "n02",
+      "spot": "table"
+    }
   ],
-  "scripted": [{ "time": "03:00", "event": "knocks" }]
+  "scripted": [
+    {
+      "time": "03:00",
+      "event": "knocks"
+    }
+  ],
+  "tape": {
+    "id": "t1",
+    "spot": "bunk"
+  },
+  "station": {
+    "mug": "kitchen",
+    "mugText": "A chipped cream mug by the sink, scrubbed clean. HOLLIS is scratched into the glaze."
+  }
 }

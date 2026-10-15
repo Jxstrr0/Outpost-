@@ -77,5 +77,13 @@
       "id": "n2b",
       "time": "01:00"
     }
-  ]
+  ],
+  "tape": {
+    "id": "t2",
+    "spot": "radioDesk"
+  },
+  "station": {
+    "mug": "console",
+    "mugText": "Hollis's mug, on the met console. You left it by the sink."
+  }
 }

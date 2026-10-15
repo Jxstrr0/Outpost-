@@ -28,6 +28,7 @@ export function defaultSave() {
     supplyChoices: {}, // { [nightNumber]: ['fuel', 'fuses'] } chosen before that night
     logsFound: [],
     notesFound: [],
+    tapesFound: [],
     endingsSeen: [],
     radioTags: [], // replies chosen on the radio, which later calls react to
     radioSaid: [], // the last few things the player said on the radio

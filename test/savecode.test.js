@@ -16,6 +16,7 @@ function playedSave() {
     supplyChoices: { 2: ['fuel', 'fuses'], 3: ['battery', 'food'] },
     logsFound: ['v01', 'v02', 'v03', 'v04'],
     notesFound: ['n01', 'n02'],
+    tapesFound: ['t1'],
     endingsSeen: ['quiet'],
     radioTags: ['honest', 'stayed'],
     radioSaid: ['All quiet here.', "I'm staying put."],
@@ -182,7 +183,7 @@ test('every error message is plain and friendly', () => {
 });
 
 test('describeSave reads naturally', () => {
-  assert.equal(describeSave(playedSave()), 'Night 2, 4 log entries, 2 notes');
+  assert.equal(describeSave(playedSave()), 'Night 2, 4 log entries, 2 notes, 1 tape');
   assert.equal(describeSave({ ...defaultSave(), currentNight: 2, logsFound: ['v01'], notesFound: ['n01'] }), 'Night 2, 1 log entry, 1 note');
 });
 

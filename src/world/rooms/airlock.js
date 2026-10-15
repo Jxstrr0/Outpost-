@@ -29,4 +29,5 @@ export function buildAirlock(b) {
   for (let i = 0; i < 4; i++) k.box(0.01, 0.16, 0.01, C.steelDark, -0.5 + Math.cos(i * 1.57) * 0.08, 2.65, 6.0 + Math.sin(i * 1.57) * 0.08, { shade: 0 });
   b.anchor('fixtureAirlock', -0.5, 2.62, 6.0);
   b.anchor('airlockOuter', -0.5, 1.2, 6.9);
+  b.anchor('airlockHook', -1.78, 0.476, 6.3); // on the bench, under the gear
 }

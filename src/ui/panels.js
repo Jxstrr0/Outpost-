@@ -3,7 +3,7 @@
 
 import { formatClock } from '../core/clock.js';
 import { openReading, nextUpcomingReading, logReading, chooseReply } from '../systems/index.js';
-import { LOGS, NOTES, NIGHTS } from '../story/nights.js';
+import { LOGS, NOTES, NIGHTS, TAPES } from '../story/nights.js';
 import { CALLS, visibleLines } from '../story/radio.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -100,6 +100,13 @@ export function createPanels(root, hooks) {
       body += `<div class="log-entry"><div class="meta">NOTES YOU'VE FOUND</div></div>`;
       body += notes.map((id) => `<div class="log-entry"><div class="meta">${esc(NOTES[id].title)}</div><div class="text">${esc(NOTES[id].text)}</div></div>`).join('');
     }
+    const tapes = [...new Set([...(save.tapesFound || []), ...state.tapesFound])].filter((id) => TAPES[id]);
+    if (tapes.length) {
+      body += `<div class="log-entry"><div class="meta">TAPES YOU'VE PLAYED</div></div>`;
+      body += tapes
+        .map((id) => `<div class="log-entry"><div class="meta">${esc(TAPES[id].title)}</div><div class="text">${TAPES[id].lines.filter((l) => l.who).map((l) => `${esc(l.who)}: ${esc(l.text)}`).join('<br>')}</div></div>`)
+        .join('');
+    }
     frame('terminal', 'Keeper log · R. Vance', body);
     for (const id of state.logsRecovered) seenLogs.add(id);
   }
@@ -136,6 +143,15 @@ export function createPanels(root, hooks) {
     );
   }
 
+  /** A recorder tape, written out as a transcript. */
+  function renderTape(id) {
+    const tape = TAPES[id];
+    const lines = (tape?.lines || [])
+      .map((l) => (l.who ? `<div class="radio-line"><span class="who">${esc(l.who)}</span> ${esc(l.text)}</div>` : `<div class="radio-end">${esc(l.text)}</div>`))
+      .join('');
+    frame('tape', tape?.title || 'Tape', lines);
+  }
+
   function renderNote(id) {
     const note = NOTES[id];
     frame('paper', note?.title || 'Note', esc(note?.text || ''));
@@ -150,6 +166,7 @@ export function createPanels(root, hooks) {
       if (kind === 'console') renderConsole();
       if (kind === 'terminal') renderTerminal();
       if (kind === 'note') renderNote(data.id);
+      if (kind === 'tape') renderTape(data.id);
       if (kind === 'radio') renderRadio(data.id);
       screen.classList.remove('hidden');
       screen.querySelector('[data-close]')?.focus({ preventScroll: true });

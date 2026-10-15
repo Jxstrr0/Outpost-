@@ -139,6 +139,7 @@ const FIELD_CHECKS = {
   supplyChoices: (v) => isObject(v) && Object.entries(v).every(([night, ids]) => /^\d+$/.test(night) && isIdList(ids)),
   logsFound: isIdList,
   notesFound: isIdList,
+  tapesFound: isIdList,
   endingsSeen: isIdList,
   radioTags: isIdList,
   radioSaid: (v) => Array.isArray(v) && v.every((line) => typeof line === 'string'),
@@ -185,9 +186,11 @@ export function cleanSave(data) {
 export function describeSave(save) {
   const logs = save.logsFound.length;
   const notes = save.notesFound.length;
+  const tapes = save.tapesFound?.length || 0;
   const parts = [`Night ${save.currentNight}`];
   if (logs) parts.push(`${logs} log ${logs === 1 ? 'entry' : 'entries'}`);
   if (notes) parts.push(`${notes} ${notes === 1 ? 'note' : 'notes'}`);
-  if (!logs && !notes) parts.push('nothing found yet');
+  if (tapes) parts.push(`${tapes} ${tapes === 1 ? 'tape' : 'tapes'}`);
+  if (!logs && !notes && !tapes) parts.push('nothing found yet');
   return parts.join(', ');
 }

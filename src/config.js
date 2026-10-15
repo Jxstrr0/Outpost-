@@ -157,6 +157,7 @@ export const CONFIG = {
     eyeHeight: 1.62,
     radius: 0.3,
     walkSpeed: 2.7, // metres per real second
+    pickupThroughProps: 0.5, // metres past a furniture blocker that a note or tape can still be picked up
     interactDistance: 2.3,
     lookSensitivityMouse: 0.0022, // radians per pixel at sensitivity 1
     lookSensitivityTouch: 0.0055,

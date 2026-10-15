@@ -15,6 +15,7 @@ import { doorLeaf } from './props.js';
 import { createMetScreen, createTerminalScreen } from './screens.js';
 import { createLighting } from './lighting.js';
 import { buildExterior, SHED_CAN_SLOTS } from './exterior.js';
+import { createStoryProps } from './story-props.js';
 
 const D = CONFIG.doors;
 
@@ -26,13 +27,6 @@ function makeCan() {
   box(can, 0.05, 0.08, 0.05, mat(PALETTE.yellow), 0, 0.43, 0.13); // spout
   can.children.forEach((m) => (m.castShadow = true));
   return can;
-}
-
-function makeNote() {
-  return new THREE.Mesh(
-    new THREE.PlaneGeometry(0.16, 0.2),
-    new THREE.MeshLambertMaterial({ color: PALETTE.paper, emissive: 0x3a3428, side: THREE.DoubleSide })
-  );
 }
 
 /** A hinged door: a leaf on a pivot, an interaction box that swings with it, and a collider. */
@@ -162,8 +156,8 @@ export function buildStation(scene, camera, { getLogTitle }) {
   carried.visible = false;
   camera.add(carried);
 
-  // Notes placed per night
-  const noteMeshes = new Map();
+  // Notes, tapes and the things that move between nights.
+  const story = createStoryProps(b);
 
   const station = {
     group: b.group,
@@ -176,28 +170,9 @@ export function buildStation(scene, camera, { getLogTitle }) {
     lightingMode: 'normal',
     meshes: b.meshes,
 
-    /** Place this night's notes and reset moving parts. */
+    /** Place this night's notes, tape and changes, and reset moving parts. */
     resetForNight(state, night) {
-      for (const [, mesh] of noteMeshes) b.group.remove(mesh);
-      noteMeshes.clear();
-      for (let i = b.interactables.length - 1; i >= 0; i--) {
-        if (b.interactables[i].kind === 'note') b.interactables.splice(i, 1);
-      }
-      for (const note of night.notes || []) {
-        const spot = anchors[note.spot];
-        if (!spot) continue;
-        const mesh = makeNote();
-        mesh.position.copy(spot);
-        if (note.spot === 'breaker') {
-          mesh.rotation.y = Math.PI / 2;
-        } else {
-          mesh.rotation.x = -Math.PI / 2;
-          mesh.rotation.z = (note.id.charCodeAt(2) % 5) * 0.2 - 0.4;
-        }
-        b.group.add(mesh);
-        noteMeshes.set(note.id, mesh);
-        b.interactable('note', mesh, { noteId: note.id }, `note-${note.id}`);
-      }
+      story.reset(night);
       for (const door of doors) door.angle = state.doors[door.id] === 'open' ? door.open : 0;
       exterior.reset();
       this.update(state, 0, 0, { reducedFlicker: false }, true);
@@ -253,7 +228,7 @@ export function buildStation(scene, camera, { getLogTitle }) {
       for (let i = emptyIndex; i < empties.length; i++) empties[i].visible = false;
       carried.visible = !!state.carrying;
 
-      for (const [id, mesh] of noteMeshes) mesh.visible = !state.notesFound.includes(id);
+      story.update(state);
       exterior.update(state, dt, t, camera);
     },
   };

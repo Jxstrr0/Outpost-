@@ -69,6 +69,7 @@ export function createState(night, options = {}) {
     logQueue: [...(night.logs || [])], // log ids recovered in order, one per logged reading
     logsRecovered: [],
     notesFound: [],
+    tapesFound: [],
 
     // The supply room's stock, and what the player has in their pockets.
     inventory: {
