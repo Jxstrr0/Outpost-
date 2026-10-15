@@ -23,10 +23,10 @@ export function useDoor(state, { events }, id) {
   return true;
 }
 
-/** Debug: unlock every door except the outer airlock door, which opens with the exterior. */
+/** Debug: unlock every door. */
 export function unlockDoors(state, { events }) {
   for (const id of DOOR_IDS) {
-    if (state.doors[id] === 'locked' && id !== 'airlockOuter') state.doors[id] = 'closed';
+    if (state.doors[id] === 'locked') state.doors[id] = 'closed';
   }
   events.emit('door:unlocked');
 }

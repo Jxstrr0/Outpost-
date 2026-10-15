@@ -24,9 +24,15 @@ function meter(parent, label) {
 /** The single most urgent thing to do, and where. Reads state only. */
 export function computeObjective(state) {
   const cans = fullCansLeft(state);
+  const indoorCans = state.jerryCans.some((c) => c.state === 'full' && c.where !== 'shed');
+  const canWhere = indoorCans ? 'Jerry cans: generator room, east wall' : 'Jerry cans: the fuel shed outside, east of the station';
+  const outside = state.room === 'outside';
   const freezing = state.temp < CONFIG.heat.freezeBelow;
   const gen = state.generator;
 
+  if (outside && state.bodyHeat < CONFIG.body.dangerBelow) {
+    return { text: 'Get back inside. You are freezing', where: 'Follow the tether back to the airlock', urgent: true };
+  }
   if (gen.stalled && gen.cranking <= 0 && state.fuel > 0) {
     return { text: 'Restart the generator', where: 'Generator room', urgent: true };
   }
@@ -45,7 +51,7 @@ export function computeObjective(state) {
   }
   if (state.fuel <= 0) {
     return cans > 0
-      ? { text: 'Refuel the generator', where: 'Jerry cans: generator room, east wall', urgent: true }
+      ? { text: 'Refuel the generator', where: canWhere, urgent: true }
       : { text: 'No fuel left. Save the battery', where: 'Lights off, heater only when you must', urgent: true };
   }
   if (freezing && !state.heaterOn) {
@@ -64,6 +70,16 @@ export function computeObjective(state) {
       : state.inventory.tape > 0
         ? { text: 'The north window has cracked', where: 'Seal tape: supply room shelves', urgent: true }
         : { text: 'Out of tape. The window stays cracked', where: 'Keep the heater running', urgent: false };
+  }
+  if (state.doors.airlockOuter === 'open' && !outside && state.room !== 'airlock') {
+    return { text: 'Close the outer door', where: 'Airlock. The cold is pouring in', urgent: false };
+  }
+  if (state.antennaIced) {
+    return {
+      text: 'Ice on the mast antenna',
+      where: outside ? 'Follow the tether north to the beacon' : 'Radio and console are dead. Knock it off at the north mast',
+      urgent: !!openReading(state) || !!ringingCall(state),
+    };
   }
   if (state.fuelLineFrozen && state.generator.running) {
     return state.pocket.heatGun
@@ -86,7 +102,14 @@ export function computeObjective(state) {
     return { text: 'Start the generator', where: 'Generator room', urgent: state.power < CONFIG.power.dangerBelow };
   }
   if (state.fuel < 20 && cans > 0) {
-    return { text: 'Fuel is low. Fetch a jerry can', where: 'Generator room, east wall', urgent: false };
+    return { text: 'Fuel is low. Fetch a jerry can', where: canWhere.replace('Jerry cans: ', ''), urgent: false };
+  }
+  if (state.mastDuty && !state.mastInspected) {
+    return {
+      text: 'Inspect the north mast',
+      where: outside ? 'Follow the tether north to the beacon' : 'Out through the airlock. Follow the tether',
+      urgent: false,
+    };
   }
   const next = nextUpcomingReading(state);
   if (next) {
@@ -110,6 +133,7 @@ export function createHud(root) {
   const temp = meter(status, 'TEMP');
   const torch = meter(status, 'TORCH');
   const mind = meter(status, 'NERVES');
+  const body = meter(status, 'BODY');
   const pocket = el('div', 'hud-pocket', status);
 
   const objective = el('div', 'hud-objective', hud);
@@ -151,6 +175,9 @@ export function createHud(root) {
       if (fl.owned) setMeter(torch, fl.battery, fl.on ? `${Math.round(fl.battery)}%` : 'off', fl.battery < CONFIG.flashlight.lowBelow);
       mind.row.classList.toggle('hidden', !state.sanityEnabled);
       if (state.sanityEnabled) setMeter(mind, state.sanity, `${Math.round(state.sanity)}`, state.sanity < CONFIG.sanity.dangerBelow);
+      const showBody = state.room === 'outside' || state.bodyHeat < 99.5;
+      body.row.classList.toggle('hidden', !showBody);
+      if (showBody) setMeter(body, state.bodyHeat, `${Math.round(state.bodyHeat)}`, state.bodyHeat < CONFIG.body.dangerBelow);
       const held = [state.pocket.fuse && 'fuse', state.pocket.tape && 'tape', state.pocket.heatGun && 'heat gun'].filter(Boolean);
       const pocketText = held.length ? `Pockets: ${held.join(', ')}` : '';
       if (pocket.textContent !== pocketText) pocket.textContent = pocketText;
@@ -164,7 +191,9 @@ export function createHud(root) {
         objWhere.textContent = obj.where;
       }
 
-      const frostLevel = (H.frostStartsBelow - state.temp) / (H.frostStartsBelow - H.frostFullAt);
+      const roomFrost = (H.frostStartsBelow - state.temp) / (H.frostStartsBelow - H.frostFullAt);
+      const bodyFrost = (CONFIG.body.frostFrom - state.bodyHeat) / CONFIG.body.frostFrom;
+      const frostLevel = Math.max(state.room === 'outside' ? 0 : roomFrost, bodyFrost);
       frost.style.opacity = String(Math.max(0, Math.min(1, frostLevel)));
 
       const action = interactor.action;

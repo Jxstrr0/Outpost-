@@ -45,7 +45,8 @@ export function createPlayer(camera) {
       this.apply();
     },
 
-    update(dt, input, colliders, settings) {
+    /** `speedScale` slows the walk (deep snow, a gust in your face). */
+    update(dt, input, colliders, settings, speedScale = 1) {
       const invert = settings.invertY ? -1 : 1;
       this.yaw -= input.lookX;
       this.pitch -= input.lookY * invert;
@@ -60,8 +61,8 @@ export function createPlayer(camera) {
       }
       const sin = Math.sin(this.yaw);
       const cos = Math.cos(this.yaw);
-      const vx = (-sin * my + cos * mx) * P.walkSpeed;
-      const vz = (-cos * my - sin * mx) * P.walkSpeed;
+      const vx = (-sin * my + cos * mx) * P.walkSpeed * speedScale;
+      const vz = (-cos * my - sin * mx) * P.walkSpeed * speedScale;
 
       this.x += vx * dt;
       this.resolve(colliders);

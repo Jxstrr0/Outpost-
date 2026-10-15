@@ -296,6 +296,7 @@ export function createMenus(root) {
           <div class="stat"><div class="n">${state.logsRecovered.length}</div><div class="l">log entries recovered</div></div>
           <div class="stat"><div class="n">${state.lowestTemp.toFixed(1)}°</div><div class="l">lowest temperature</div></div>
           <div class="stat"><div class="n">${state.notesFound.length}</div><div class="l">notes found</div></div>
+          ${state.mastDuty ? `<div class="stat"><div class="n">${state.mastInspected ? 'Yes' : 'No'}</div><div class="l">north mast inspected</div></div>` : ''}
         </div>
         ${supplyHtml}
         <div class="btn-row"><button class="btn primary" data-next ${nextNight ? 'disabled' : ''}>${nextNight ? `Begin night ${nextNight}` : 'Continue'}</button></div>`,

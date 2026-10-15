@@ -47,6 +47,8 @@ export const CONFIG = {
     frostStartsBelow: 5, // screen-edge frost begins
     frostFullAt: -10,
     crackCooling: 2, // a cracked window makes the station lose heat this many times faster
+    outerDoorCooling: 1.6, // the outer airlock door left open
+    throughDraftCooling: 3, // the outer door and an inner airlock door both open: wind blows through
   },
 
   failures: {
@@ -59,6 +61,7 @@ export const CONFIG = {
     heaterFaultEvery: 520, // the heater blows a fuse
     fuelLineEvery: 420, // the fuel line freezes while the generator runs
     windowCrackEvery: 520, // the north window cracks
+    antennaIcingEvery: 480, // ice builds on the mast antenna: radio and console go to static
   },
 
   repairs: {
@@ -66,6 +69,45 @@ export const CONFIG = {
     fuseSeconds: 1.5,
     tapeSeconds: 4,
     thawSeconds: 10,
+    inspectSeconds: 4, // checking the instruments on the north mast
+    deiceSeconds: 3, // knocking the ice off the antenna
+  },
+
+  // Outside (night 3 on). Body heat is per game minute, like everything else: a trip to the
+  // mast and back takes 60 to 90 real seconds, which is 100 to 145 game minutes.
+  body: {
+    outsideLoss: 0.45, // body heat lost per game minute outside
+    gustFactor: 2, // lost this many times faster in a whiteout gust
+    warmGain: 1.6, // regained per game minute indoors when the station is 5 °C or warmer
+    coldGain: 0.4, // regained indoors when it's colder than that
+    warmAbove: 5,
+    dangerBelow: 35, // HUD meter turns red and the screen frosts
+    frostFrom: 60, // body heat where screen frost starts
+  },
+
+  weather: {
+    gustEvery: [70, 140], // game minutes between whiteout gusts, min and max
+    gustMinutes: 12, // how long a gust lasts (about 7.5 real seconds)
+  },
+
+  exterior: {
+    snowSpeed: 0.7, // walking speed outside, as a fraction of indoors
+    gustSpeed: 0.55, // walking into a gust
+    fogColor: 0x1b232c,
+    fogNear: 1,
+    fogFar: 14, // the design's 8 to 15 m visibility
+    gustFogFar: 4,
+    fogBlendPerSecond: 2.5,
+    snowFlakes: 700,
+    snowBox: 22, // metres around the player that snow falls in
+    snowHeight: 6,
+    snowFlakeSize: 0.09,
+    snowFall: 0.9, // metres per second
+    snowWind: 1.2, // sideways drift, metres per second
+    gustSnowWind: 7,
+    footprintEvery: 0.75, // metres between prints
+    footprintCount: 220,
+    beaconBlinkSeconds: 1.4,
   },
 
   stock: {
@@ -96,7 +138,7 @@ export const CONFIG = {
     hallucinateBelow: 30, // sounds and HUD alerts that aren't real
     hallucinationEvery: 22, // average game minutes between them
     dangerBelow: 30,
-    shocks: { knocks: 8, roofSteps: 6, anomaly: 10, radioEcho: 8 }, // scripted moments
+    shocks: { knocks: 8, roofSteps: 6, anomaly: 10, radioEcho: 8, footprints: 10 }, // scripted moments
   },
 
   duties: {
@@ -179,6 +221,11 @@ export const CONFIG = {
     crackWindBoost: 1.8, // the wind is this much louder with the north window cracked
     sputterEvery: [3, 6], // a frozen fuel line makes the engine sputter this often (seconds)
     glassTickEvery: [5, 11], // a cracked window ticks in the cold
+    outsideWindBoost: 2.6, // the wind outside, against the wind heard through the walls
+    openDoorWindBoost: 1.6,
+    gustWindBoost: 1.7,
+    gustIndoorBoost: 1.25,
+    icedStaticBoost: 4, // the radio set hisses loudly while the antenna is iced
   },
 
   lighting: {

@@ -55,3 +55,37 @@ export function openHops(from, to, doors = {}) {
   }
   return Infinity;
 }
+
+/**
+ * The yard (night 3 on). North is -z. The outer airlock door opens south at (-0.5, 7).
+ * The tether runs west along the station's south side, up past the west door, and out
+ * to the north mast, so the walk there and back takes 60 to 90 seconds.
+ */
+export const YARD = {
+  minX: -24,
+  maxX: 14,
+  minZ: -34,
+  maxZ: 16,
+  mast: { x: -8, z: -26 },
+  shed: { minX: 8, maxX: 11, minZ: -4, maxZ: 0 }, // open on its west side
+  tether: [
+    [-0.5, 8.4],
+    [-6, 8.6],
+    [-13.6, 8.4],
+    [-14, 1],
+    [-13.6, -7.5],
+    [-11.5, -16],
+    [-8.6, -24.6],
+  ],
+};
+
+/** Length of the tether line in metres. */
+export function tetherLength() {
+  let total = 0;
+  for (let i = 1; i < YARD.tether.length; i++) {
+    const [ax, az] = YARD.tether[i - 1];
+    const [bx, bz] = YARD.tether[i];
+    total += Math.hypot(bx - ax, bz - az);
+  }
+  return total;
+}

@@ -7,7 +7,7 @@
     "fuel": 22,
     "temp": 4
   },
-  "jerryCans": 2,
+  "jerryCans": 1,
   "systems": [
     "sanity"
   ],
@@ -19,14 +19,16 @@
   "doors": {
     "supply": "closed",
     "airlockInner": "closed",
-    "airlockSide": "closed"
+    "airlockSide": "closed",
+    "airlockOuter": "closed"
   },
   "failures": {
     "generatorStall": 1.35,
     "breakerTrip": 1.1,
     "heaterFault": 1.2,
     "fuelLine": 1,
-    "windowCrack": 1
+    "windowCrack": 1,
+    "antennaIcing": 1.2
   },
   "readings": [
     {
@@ -64,5 +66,7 @@
       "time": "02:30"
     }
   ],
-  "scripted": []
+  "scripted": [],
+  "shedCans": 2,
+  "mastInspection": true
 }

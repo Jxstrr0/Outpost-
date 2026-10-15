@@ -46,6 +46,24 @@ function noPower(s, bg, ink) {
   s.texture.needsUpdate = true;
 }
 
+/** Snow on the screen: the antenna is iced and nothing comes through. */
+function staticNoise(s, ink) {
+  const g = s.g;
+  clear(g, '#050403');
+  g.fillStyle = ink;
+  for (let i = 0; i < 900; i++) {
+    const x = Math.random() * W;
+    const y = Math.random() * H;
+    g.globalAlpha = 0.25 + Math.random() * 0.6;
+    g.fillRect(x, y, 2 + Math.random() * 3, 2);
+  }
+  g.globalAlpha = 1;
+  g.font = 'bold 24px monospace';
+  g.fillText('NO SIGNAL: NORTH MAST', 24, H / 2);
+  scanlines(g);
+  s.texture.needsUpdate = true;
+}
+
 /** Amber met console. */
 export function createMetScreen(parent, position, rotationY) {
   const s = createScreen(parent, 0.62, 0.39, position, rotationY);
@@ -53,6 +71,10 @@ export function createMetScreen(parent, position, rotationY) {
     const g = s.g;
     if (!state.consolesPowered) {
       noPower(s, '#020201', '#f2b54a');
+      return;
+    }
+    if (state.antennaIced) {
+      staticNoise(s, '#f2b54a');
       return;
     }
     clear(g, '#140c02');

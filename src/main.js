@@ -23,6 +23,7 @@ import {
   ringNow,
   sanityShock,
   setPlayerRoom,
+  startGust,
   FAILURE_IDS,
 } from './systems/index.js';
 import { roomAt } from './world/layout.js';
@@ -138,6 +139,8 @@ window.addEventListener(
 );
 
 events.on('scripted:anomaly', () => station.lighting.anomaly());
+// Night 3: a second set of footprints beside yours in the snow.
+events.on('scripted:footprints', () => station.exterior.addSecondSet());
 // Scripted moments shake the player's nerves (night 3 on).
 for (const id of SCRIPTED_EVENTS) events.on(`scripted:${id}`, () => game.state && sanityShock(game.state, game.ctx, id));
 // Night 2: the radio plays the player's own words back to them.
@@ -159,7 +162,8 @@ player.spawn(station.anchors.spawn, 0.5);
 
 /** Systems context for a night; the debug panel can switch random failures off. */
 function nightContext(night) {
-  const effective = game.failuresOn ? night : { ...night, failures: { generatorStall: 0, breakerTrip: 0 } };
+  const off = Object.fromEntries(FAILURE_IDS.map((id) => [id, 0]));
+  const effective = game.failuresOn ? night : { ...night, failures: off };
   return { events, night: effective };
 }
 
@@ -391,6 +395,15 @@ const debug = isDebug()
       fillPockets: () => fillPockets(game.state),
       hallucinate: () => events.emit('sanity:hallucination', { kind: ['knocks', 'whisper', 'fakeStall', 'roofSteps'][Math.floor(Math.random() * 4)] }),
       giveFlashlight: () => giveFlashlight(game.state),
+      gust: () => startGust(game.state, game.ctx),
+      goOutside: () => {
+        // Just outside the outer airlock door, facing the tether.
+        player.x = -0.5;
+        player.z = 8.0;
+        player.yaw = Math.PI / 2;
+        player.pitch = -0.1;
+        player.apply();
+      },
       stats: () => {
         let lights = 0;
         scene.traverse((o) => {
@@ -406,6 +419,12 @@ if (debug) window.__outpost = { game, player, station, renderer, scene, camera, 
 
 // ---------- Main loop ----------
 
+/** Deep snow slows you down outside, and a gust slows you more. */
+function walkScale(state) {
+  if (state.room !== 'outside') return 1;
+  return state.gust.active ? CONFIG.exterior.gustSpeed : CONFIG.exterior.snowSpeed;
+}
+
 let last = performance.now();
 let acc = 0;
 let time = 0;
@@ -417,7 +436,7 @@ function frame(now) {
   time += dt;
 
   if (game.mode === 'playing') {
-    player.update(dt, input, station.colliders, settings());
+    player.update(dt, input, station.colliders, settings(), walkScale(game.state));
     setPlayerRoom(game.state, roomAt(player.x, player.z));
     interactor.update(dt, input, game);
     if (input.torchPressed) toggleFlashlight(game.state, game.ctx);

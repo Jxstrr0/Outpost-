@@ -49,7 +49,11 @@ export function createState(night, options = {}) {
     doors: doorsForNight(night),
     flashlight: { owned: !!night.flashlight, on: false, battery: 100 },
 
-    jerryCans: Array.from({ length: cans }, (_, i) => ({ id: `can-${i}`, state: 'full' })),
+    // Cans in the generator room, then any left in the fuel shed outside (night 3 on).
+    jerryCans: [
+      ...Array.from({ length: cans }, (_, i) => ({ id: `can-${i}`, state: 'full', where: 'generator' })),
+      ...Array.from({ length: night.shedCans ?? 0 }, (_, i) => ({ id: `shed-${i}`, state: 'full', where: 'shed' })),
+    ],
     carrying: null, // id of a jerry can in hand, or null
 
     readings: (night.readings || []).map((r) => {
@@ -78,9 +82,16 @@ export function createState(night, options = {}) {
 
     radio: { calls: callsForNight(night), tags: [], said: [] },
 
+    // Outside (night 3 on)
+    bodyHeat: 100,
+    gust: { active: false, minutesLeft: 0, next: CONFIG.time.nightStart + CONFIG.weather.gustEvery[0] },
+    mastDuty: !!night.mastInspection, // tonight the north mast needs inspecting
+    mastInspected: false,
+    antennaIced: false,
+
     freezeMinutes: 0,
     lowestTemp: start.temp,
-    outcome: null, // null while playing, then 'survived' | 'frozen' | 'breakdown'
+    outcome: null, // null while playing, then 'survived' | 'frozen' | 'breakdown' | 'exposure'
     flags: {},
   };
 }

@@ -42,6 +42,7 @@ export function createDebugPanel(root, api) {
       <div class="dbg-row"><label>temp</label><input type="range" min="-30" max="18" data-meter="temp" /></div>
       <div class="dbg-row"><label>torch</label><input type="range" min="0" max="100" data-meter="battery" /></div>
       <div class="dbg-row"><label>nerves</label><input type="range" min="0" max="100" data-meter="sanity" /></div>
+      <div class="dbg-row"><label>body</label><input type="range" min="0" max="100" data-meter="bodyHeat" /></div>
       <div class="dbg-row">fail ${failures}</div>
       <div class="dbg-row">event ${scripted}</div>
       <div class="dbg-row">sound ${sounds}</div>
@@ -53,6 +54,7 @@ export function createDebugPanel(root, api) {
       </div>
       <div class="dbg-row"><button data-doors>unlock doors</button><button data-torch>give flashlight</button></div>
       <div class="dbg-row"><button data-ring>radio call now</button><button data-pockets>fuse+tape+heat gun</button><button data-hallu>hallucinate</button></div>
+      <div class="dbg-row"><button data-outside>go outside</button><button data-gust>gust</button></div>
       <div class="dbg-row"><button data-wipe>wipe save</button></div>
     </div>`;
   panel.style.pointerEvents = 'auto';
@@ -80,6 +82,8 @@ export function createDebugPanel(root, api) {
   q('[data-ring]').addEventListener('click', () => api.ringRadio());
   q('[data-pockets]').addEventListener('click', () => api.fillPockets());
   q('[data-hallu]').addEventListener('click', () => api.hallucinate());
+  q('[data-outside]').addEventListener('click', () => api.goOutside());
+  q('[data-gust]').addEventListener('click', () => api.gust());
 
   let frames = 0;
   let last = performance.now();

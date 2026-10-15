@@ -14,6 +14,7 @@ import { buildAirlock } from './rooms/airlock.js';
 import { doorLeaf } from './props.js';
 import { createMetScreen, createTerminalScreen } from './screens.js';
 import { createLighting } from './lighting.js';
+import { buildExterior, SHED_CAN_SLOTS } from './exterior.js';
 
 const D = CONFIG.doors;
 
@@ -100,6 +101,7 @@ export function buildStation(scene, camera, { getLogTitle }) {
   buildAirlock(b);
   b.bakeRoom('airlock');
   b.decals.bake(b.group);
+  const exterior = buildExterior(b, scene);
   const { anchors } = b;
 
   const doors = Object.keys(DOORWAYS).map((id) => makeDoor(b, id));
@@ -128,18 +130,23 @@ export function buildStation(scene, camera, { getLogTitle }) {
   // Breaker lever: up is on, down is tripped
   const lever = box(b.group, 0.05, 0.18, 0.06, mat(PALETTE.orange), anchors.breakerLever.x, anchors.breakerLever.y, anchors.breakerLever.z);
 
-  // Jerry cans: full ones in slots, empties dumped by the generator, one in hand.
-  const cans = CAN_SLOTS.map((slot, i) => {
+  // Jerry cans: full ones in slots (generator room, and the fuel shed outside), empties
+  // dumped by the generator, one in hand.
+  const placeCan = (slot, id) => {
     const can = makeCan();
     can.position.set(slot.x, slot.y, slot.z);
     can.rotation.y = Math.PI / 2;
     b.group.add(can);
     // Cans sit low, so the grab area is generous.
     const grab = hitbox(can, 0.5, 0.9, 0.55, 0, 0.45, 0);
-    const entry = b.interactable('jerryCan', grab, { canId: `can-${i}` }, `can-${i}`);
+    const entry = b.interactable('jerryCan', grab, { canId: id }, id);
     can.children.forEach((c) => (c.userData.interactable = entry));
     return can;
-  });
+  };
+  const cans = new Map([
+    ...CAN_SLOTS.map((slot, i) => [`can-${i}`, placeCan(slot, `can-${i}`)]),
+    ...SHED_CAN_SLOTS.map((slot, i) => [`shed-${i}`, placeCan(slot, `shed-${i}`)]),
+  ]);
   const empties = EMPTY_CAN_SPOTS.map((spot) => {
     const can = makeCan();
     can.position.set(spot.x, 0.085, spot.z);
@@ -165,6 +172,7 @@ export function buildStation(scene, camera, { getLogTitle }) {
     interactables: b.interactables,
     anchors,
     lighting,
+    exterior,
     lightingMode: 'normal',
     meshes: b.meshes,
 
@@ -191,6 +199,7 @@ export function buildStation(scene, camera, { getLogTitle }) {
         b.interactable('note', mesh, { noteId: note.id }, `note-${note.id}`);
       }
       for (const door of doors) door.angle = state.doors[door.id] === 'open' ? door.open : 0;
+      exterior.reset();
       this.update(state, 0, 0, { reducedFlicker: false }, true);
     },
 
@@ -235,16 +244,17 @@ export function buildStation(scene, camera, { getLogTitle }) {
 
       // Cans
       let emptyIndex = 0;
-      state.jerryCans.forEach((c, i) => {
-        if (!cans[i]) return;
-        cans[i].visible = c.state === 'full';
+      for (const can of cans.values()) can.visible = false;
+      for (const c of state.jerryCans) {
+        const can = cans.get(c.id);
+        if (can) can.visible = c.state === 'full';
         if (c.state === 'empty' && empties[emptyIndex]) empties[emptyIndex++].visible = true;
-      });
-      for (let i = state.jerryCans.length; i < cans.length; i++) cans[i].visible = false;
+      }
       for (let i = emptyIndex; i < empties.length; i++) empties[i].visible = false;
       carried.visible = !!state.carrying;
 
       for (const [id, mesh] of noteMeshes) mesh.visible = !state.notesFound.includes(id);
+      exterior.update(state, dt, t, camera);
     },
   };
   return station;
