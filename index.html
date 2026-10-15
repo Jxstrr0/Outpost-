@@ -12,6 +12,13 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2305070a'/%3E%3Cpath d='M32 10v34M24 44h16M32 18l10 6M32 26l-9 5' stroke='%23e07a2c' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='52' r='3' fill='%23e07a2c'/%3E%3C/svg%3E" />
   </head>
   <body>
+    <div id="boot" role="status" aria-live="polite" style="position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#05070a;color:#c9d2d8;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:0.3em;text-align:center;padding:16px">
+      <div style="font-size:clamp(28px,7vw,56px)">OUTPOST</div>
+      <div style="font-size:12px;letter-spacing:0.18em;color:#7d8a93">WARMING UP THE STATION</div>
+      <div style="width:120px;height:2px;background:#1b2228;overflow:hidden"><div style="width:40%;height:100%;background:#e0702a;animation:boot 1.2s ease-in-out infinite alternate"></div></div>
+      <noscript style="letter-spacing:0.05em;color:#e0702a">Outpost needs JavaScript to run.</noscript>
+    </div>
+    <style>@keyframes boot { from { transform: translateX(-60%); } to { transform: translateX(200%); } } @media (prefers-reduced-motion: reduce) { #boot div div { animation: none !important; } }</style>
     <canvas id="scene" aria-label="Outpost game view"></canvas>
     <div id="ui"></div>
     <script type="module" src="/src/main.js"></script>

@@ -4,6 +4,8 @@ import { changeSanity } from './sanity.js';
 /** Weather readings open on schedule, then close; logging one recovers a keeper log. */
 export function updateDuties(state, dt, { events, rng }) {
   for (const reading of state.readings) {
+    // An iced antenna holds the window open: the trip out costs time, not the reading.
+    if (reading.status === 'open' && state.antennaIced) reading.closes += dt;
     if (reading.status === 'upcoming' && state.minute >= reading.closes) {
       // Skipped past the whole window (debug time skips): it was never seen.
       reading.status = 'missed';
@@ -55,8 +57,11 @@ export function logReading(state, { events }) {
   }
   reading.status = 'logged';
   changeSanity(state, CONFIG.sanity.readingBonus, { events });
-  const logId = state.logQueue.shift() || null;
-  if (logId) state.logsRecovered.push(logId);
+  const logId = reading.logId;
+  if (logId) {
+    state.logsRecovered.push(logId);
+    state.logQueue = state.logQueue.filter((id) => id !== logId);
+  }
   events.emit('reading:logged', { reading, logId });
   if (logId) events.emit('log:recovered', { id: logId });
   return logId;

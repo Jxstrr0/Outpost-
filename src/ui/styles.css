@@ -1081,8 +1081,28 @@ h2 {
 .ending .credits {
   margin-top: 28px;
   font-size: 0.85em;
-  line-height: 1.8;
-  opacity: 0.75;
+  line-height: 1.7;
+  opacity: 0.8;
+}
+
+.credit {
+  margin-bottom: 14px;
+}
+
+.credit-head {
+  font-size: 0.8em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.title-tag {
+  max-width: 34em;
+  margin: 14px 0 6px;
+  font-family: var(--font-read);
+  font-size: 1.05em;
+  line-height: 1.5;
+  opacity: 0.85;
 }
 
 .screen.white {

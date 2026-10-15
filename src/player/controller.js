@@ -69,7 +69,8 @@ export function createPlayer(camera) {
       this.z += vz * dt;
       this.resolve(colliders);
 
-      const speed = Math.hypot(vx, vz);
+      // Reduced flicker also means reduced motion: no head bob.
+      const speed = settings.reducedFlicker ? 0 : Math.hypot(vx, vz);
       this.bob += speed * dt * 2.4;
       this.apply(speed);
     },

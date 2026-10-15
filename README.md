@@ -41,6 +41,7 @@ npm install
 npm run dev      # local server at http://localhost:5173/Outpost-/
 npm test         # headless simulation tests (no browser needed)
 npm run build    # production build into dist/
+npm run build:itch   # self-contained build into dist-itch/, for uploading to itch.io
 ```
 
 Every push to `main` builds, tests and deploys to GitHub Pages. Pull requests run the tests and the build as a check.
@@ -51,4 +52,11 @@ In the repository, go to **Settings → Pages** and set **Source** to **GitHub A
 
 ## Status
 
-Milestones M0 to M8 are done: the full night loop, nights 1 and 2 with their story, the day summary and supply drop, saving, settings, the debug panel, the low-poly station with its supply room, airlock, doors and flashlight, and the audio pass (positional sound through walls, a sound for every fault, directional subtitles), and the new systems: radio calls from Dispatch, the NERVES meter, heater fuses, a freezing fuel line, a cracking window and hold-to-repair, across all five nights (nights 3 to 5 still need their logs and notes), and the exterior: a snowy yard with a tether out to the north mast, a fuel shed, body heat, whiteout gusts, antenna icing and footprints, and M8: every log entry, note and tape across all five nights, small changes to the station between nights, Vance's taped-up bunk room, the voice at the west door on night 5, and three endings (Relief, Answer and a secret one). See the Milestones section of `docs/DESIGN.md` for what comes next.
+All milestones, M0 to M9, are done. The game is complete from title screen to credits:
+
+- **Five nights**, each adding something: power, fuel, heat and readings; the radio, heater fuses and the supply room; NERVES, the frozen fuel line and the yard outside with the north mast; the cracked window and Vance's sealed room; and night 5, with everything at once and a voice at the west door.
+- **The story:** 25 keeper log entries recovered by logging readings, 10 handwritten notes, 5 recorder tapes, radio calls that remember your replies, and small changes around the station between nights.
+- **Three endings:** Relief, Answer, and a secret one for finding every log entry and note.
+- **The station:** low-poly rooms built in code, the yard with its tether, fuel shed and mast, whiteout gusts, positional sound through walls, subtitles for every sound, saving, save codes, settings and a debug panel (`?debug=1`).
+
+To put it on itch.io, see [docs/ITCH.md](docs/ITCH.md).

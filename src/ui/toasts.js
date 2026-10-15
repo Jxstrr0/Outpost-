@@ -6,6 +6,9 @@ import { formatClock } from '../core/clock.js';
 export function createToasts(root) {
   const box = document.createElement('div');
   box.className = 'toasts';
+  // Subtitles and status lines are read out by screen readers.
+  box.setAttribute('role', 'status');
+  box.setAttribute('aria-live', 'polite');
   root.appendChild(box);
 
   const push = (text, kind = '') => {

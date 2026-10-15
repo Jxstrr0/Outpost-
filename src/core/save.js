@@ -39,7 +39,17 @@ export function defaultSave() {
 /** @type {ReturnType<typeof defaultSave>} */
 let current = defaultSave();
 
+/** A player whose system asks for reduced motion starts with reduced flicker on. */
+function prefersReducedMotion() {
+  try {
+    return !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
 export function loadSave() {
+  current.settings.reducedFlicker = prefersReducedMotion();
   try {
     const raw = window.localStorage.getItem(SAVE_KEY);
     if (raw) {
@@ -47,7 +57,7 @@ export function loadSave() {
       current = {
         ...defaultSave(),
         ...parsed,
-        settings: { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) },
+        settings: { ...DEFAULT_SETTINGS, reducedFlicker: prefersReducedMotion(), ...(parsed.settings || {}) },
       };
     }
   } catch {
@@ -95,10 +105,10 @@ export function restoreSave(save) {
   return writeSave();
 }
 
-/** Start a new campaign but keep settings. */
+/** Start a new campaign but keep settings and the endings already seen. */
 export function resetCampaign() {
-  const settings = current.settings;
-  current = { ...defaultSave(), settings };
+  const { settings, endingsSeen } = current;
+  current = { ...defaultSave(), settings, endingsSeen: [...(endingsSeen || [])] };
   writeSave();
   return current;
 }

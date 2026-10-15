@@ -27,7 +27,7 @@
   "failures": {
     "generatorStall": 1.35,
     "breakerTrip": 1.1,
-    "heaterFault": 1.2,
+    "heaterFault": 1.1,
     "fuelLine": 1,
     "windowCrack": 1,
     "antennaIcing": 1.2

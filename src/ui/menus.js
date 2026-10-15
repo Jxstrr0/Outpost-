@@ -5,6 +5,15 @@ import { CONFIG } from '../config.js';
 import { SUPPLIES } from '../story/nights.js';
 import OUTCOMES from '../story/data/outcomes.json';
 import ENDINGS from '../story/data/endings.json';
+import CREDITS from '../story/data/credits.json';
+
+const ENDING_COUNT = 3;
+
+/** The credits, as HTML. */
+const creditsHtml = () =>
+  CREDITS.sections
+    .map((s) => `<div class="credit"><div class="credit-head">${esc(s.head)}</div>${s.lines.map((l) => `<div>${esc(l)}</div>`).join('')}</div>`)
+    .join('');
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
@@ -56,16 +65,19 @@ export function createMenus(root) {
       onEscape = null;
     },
 
-    title({ continueNight, onBegin, onContinue, onSettings, onBackup, onRestore }) {
+    title({ continueNight, endingsSeen = 0, onBegin, onContinue, onSettings, onBackup, onRestore, onCredits }) {
       show(
         `<h1 class="title-logo">OUTPOST</h1>
         <div class="title-sub">Station Kestrel-4 · Longlight Interactive</div>
+        <p class="title-tag">Five nights alone on an arctic weather station. Keep the power on, log the weather, and don't open the west door.</p>
         <div class="menu">
           ${continueNight ? `<button class="btn primary" data-continue>Continue: night ${continueNight}</button>` : ''}
           <button class="btn ${continueNight ? '' : 'primary'}" data-begin>${continueNight ? 'New campaign' : 'Begin shift'}</button>
           <button class="btn" data-settings>Settings</button>
+          <button class="btn" data-credits>Credits</button>
           ${SAVE_CODE_BUTTONS}
         </div>
+        ${endingsSeen ? `<div class="fineprint">Endings found: ${endingsSeen} of ${ENDING_COUNT}</div>` : ''}
         <div class="fineprint">
           Headphones help: every fault has its own sound.<br />
           Phone: play sideways. Left thumb moves, right thumb looks, USE to interact.<br />
@@ -77,6 +89,17 @@ export function createMenus(root) {
       on('[data-settings]', onSettings);
       on('[data-backup]', onBackup);
       on('[data-restore]', onRestore);
+      on('[data-credits]', onCredits);
+    },
+
+    credits(onBack) {
+      show(
+        `<div class="ending"><h2>${esc(CREDITS.title)}</h2>
+        <div class="credits">${creditsHtml()}</div>
+        <div class="btn-row"><button class="btn primary" data-back>Back</button></div></div>`,
+        { solid: true, escape: onBack }
+      );
+      on('[data-back]', onBack);
     },
 
     nightCard(night, onDone) {
@@ -257,7 +280,7 @@ export function createMenus(root) {
           <input id="s-fx" type="range" min="0" max="1" step="0.05" value="${settings.effectsVolume}" />
           <label for="s-subs">Subtitles for sounds</label>
           <input id="s-subs" type="checkbox" ${settings.subtitles ? 'checked' : ''} />
-          <label for="s-flicker">Reduced flicker</label>
+          <label for="s-flicker">Reduced flicker and motion</label>
           <input id="s-flicker" type="checkbox" ${settings.reducedFlicker ? 'checked' : ''} />
           <label for="s-text">Text size</label>
           <select id="s-text">
@@ -355,7 +378,7 @@ export function createMenus(root) {
           <h2>${esc(e.title)}</h2>
           ${e.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
           ${logHtml}
-          <div class="credits">${ENDINGS.credits.map((c) => esc(c)).join('<br>')}</div>
+          <div class="credits">${creditsHtml()}</div>
           <div class="btn-row"><button class="btn primary" data-title>Back to title</button></div>
         </div>`,
         { solid: id !== 'answer', white: id === 'answer' }
