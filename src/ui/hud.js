@@ -85,6 +85,7 @@ export function createHud(root) {
   const power = meter(status, 'POWER');
   const fuel = meter(status, 'FUEL');
   const temp = meter(status, 'TEMP');
+  const torch = meter(status, 'TORCH');
 
   const objective = el('div', 'hud-objective', hud);
   const objMain = el('div', 'hud-objective-main', objective);
@@ -119,6 +120,9 @@ export function createHud(root) {
       setMeter(fuel, state.fuel, `${Math.round(state.fuel)}%`, state.fuel < CONFIG.fuel.dangerBelow);
       const H = CONFIG.heat;
       setMeter(temp, ((state.temp - H.min) / (H.max - H.min)) * 100, `${state.temp.toFixed(0)}°`, state.temp < H.dangerBelow);
+      const fl = state.flashlight;
+      torch.row.classList.toggle('hidden', !fl.owned);
+      if (fl.owned) setMeter(torch, fl.battery, fl.on ? `${Math.round(fl.battery)}%` : 'off', fl.battery < CONFIG.flashlight.lowBelow);
 
       const obj = computeObjective(state);
       const text = `${obj.text}|${obj.where}|${obj.urgent}`;

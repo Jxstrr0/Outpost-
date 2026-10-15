@@ -18,6 +18,7 @@ export function attachTouchInput(root, input, hooks) {
     <div class="touch-zone right"></div>
     <div class="stick idle"><div class="stick-knob"></div></div>
     <button class="touch-btn use" aria-label="Use">USE</button>
+    <button class="touch-btn torch hidden" aria-label="Flashlight">TORCH</button>
     <button class="touch-btn pause" aria-label="Pause">II</button>
   `;
   root.appendChild(el);
@@ -28,6 +29,7 @@ export function attachTouchInput(root, input, hooks) {
   const knob = el.querySelector('.stick-knob');
   const useBtn = el.querySelector('.use');
   const pauseBtn = el.querySelector('.pause');
+  const torchBtn = el.querySelector('.torch');
 
   const restStick = () => {
     const r = left.getBoundingClientRect();
@@ -113,6 +115,11 @@ export function attachTouchInput(root, input, hooks) {
   useBtn.addEventListener('pointerup', endUse);
   useBtn.addEventListener('pointercancel', endUse);
 
+  torchBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    input.torchPressed = true;
+  });
+
   pauseBtn.addEventListener('click', (e) => {
     e.preventDefault();
     hooks.onPause();
@@ -128,6 +135,11 @@ export function attachTouchInput(root, input, hooks) {
     },
     setUseReady(ready) {
       useBtn.classList.toggle('ready', ready);
+    },
+    /** Show the torch button once the player has a flashlight; light it while it's on. */
+    setTorch(owned, on) {
+      torchBtn.classList.toggle('hidden', !owned);
+      torchBtn.classList.toggle('on', on);
     },
     clear() {
       stickId = lookId = null;

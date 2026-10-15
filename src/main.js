@@ -9,8 +9,19 @@ import { createRng, nightSeed } from './core/rng.js';
 import { createState } from './core/state.js';
 import { loadSave, getSave, updateSave, updateSettings, resetCampaign, rememberFound } from './core/save.js';
 import { isDebug, createDebugPanel } from './core/debug.js';
-import { stepSimulation, setMeter, forceOutcome, triggerFailure, jumpTo, unlockDoors, FAILURE_IDS } from './systems/index.js';
+import {
+  stepSimulation,
+  setMeter,
+  forceOutcome,
+  triggerFailure,
+  jumpTo,
+  unlockDoors,
+  toggleFlashlight,
+  giveFlashlight,
+  FAILURE_IDS,
+} from './systems/index.js';
 import { buildStation } from './world/station.js';
+import { createFlashlight } from './world/flashlight.js';
 import { createPlayer, createInputState } from './player/controller.js';
 import { attachDesktopInput } from './player/input-desktop.js';
 import { attachTouchInput, isTouchDevice } from './player/input-touch.js';
@@ -36,6 +47,9 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: !touchMode, powerP
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, touchMode ? R.phonePixelRatio : R.maxPixelRatio));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
+// Only the flashlight casts shadows.
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(R.fogColor);
@@ -67,6 +81,7 @@ function applySettings() {
 // ---------- World, player, UI ----------
 
 const station = buildStation(scene, camera, { getLogTitle: (id) => LOGS[id]?.title ?? id });
+const flashlight = createFlashlight(camera);
 const player = createPlayer(camera);
 const input = createInputState();
 const interactor = createInteractor(camera, station);
@@ -311,6 +326,7 @@ const debug = isDebug()
         showTitle();
       },
       unlockDoors: () => unlockDoors(game.state, game.ctx),
+      giveFlashlight: () => giveFlashlight(game.state),
       stats: () => {
         let lights = 0;
         scene.traverse((o) => {
@@ -339,7 +355,9 @@ function frame(now) {
   if (game.mode === 'playing') {
     player.update(dt, input, station.colliders, settings());
     interactor.update(dt, input, game);
+    if (input.torchPressed) toggleFlashlight(game.state, game.ctx);
     touch.setUseReady(!!interactor.action && !interactor.action.disabled);
+    touch.setTorch(game.state.flashlight.owned, game.state.flashlight.on);
 
     acc += dt * T.ticksPerSecond * game.speed;
     const maxSteps = T.maxStepsPerFrame * game.speed;
@@ -361,6 +379,7 @@ function frame(now) {
   input.consumeFrame();
 
   station.update(game.state, dt, time, settings());
+  flashlight.update(game.state, dt, settings());
   audio.update(game.state, dt, game.mode === 'playing');
   if (game.mode === 'playing') {
     hud.update(game.state, interactor);

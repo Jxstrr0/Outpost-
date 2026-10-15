@@ -18,6 +18,9 @@ import {
   triggerFailure,
   useDoor,
   unlockDoors,
+  toggleFlashlight,
+  updateFlashlight,
+  flashlightDrain,
 } from '../src/systems/index.js';
 
 const night1 = JSON.parse(readFileSync(new URL('../src/story/data/night1.json', import.meta.url)));
@@ -187,4 +190,34 @@ test('doors open and close, locked doors stay shut, and debug unlock spares the 
   useDoor(state, ctx, 'supply');
   assert.equal(state.doors.supply, 'closed');
   assert.ok(log.includes('door:opened') && log.includes('door:closed'));
+});
+
+test('the flashlight arrives on night 2, drains while on and recharges only from station power', () => {
+  assert.equal(setup(night1).state.flashlight.owned, false);
+  const { state, ctx, log } = setup(night2);
+  assert.equal(state.flashlight.owned, true);
+  assert.equal(toggleFlashlight(state, ctx), true);
+  const tick = CONFIG.time.gameMinutesPerSecond / CONFIG.time.ticksPerSecond;
+  const minutes = 100 / CONFIG.flashlight.drainPerMinute;
+  for (let m = 0; m < minutes + 5 && state.flashlight.on; m += tick) {
+    updateFlashlight(state, tick, ctx);
+  }
+  assert.equal(state.flashlight.battery, 0);
+  assert.equal(state.flashlight.on, false);
+  assert.ok(log.includes('flashlight:low') && log.includes('flashlight:dead'));
+  assert.equal(toggleFlashlight(state, ctx), false, 'a flat cell will not switch on');
+
+  state.power = 0;
+  updateFlashlight(state, 10, ctx);
+  assert.equal(state.flashlight.battery, 0, 'no recharge without station power');
+  state.power = 50;
+  updateFlashlight(state, 10, ctx);
+  assert.ok(state.flashlight.battery > 8, 'recharges while off');
+  assert.ok(state.power < 50, 'recharging draws on the station battery');
+});
+
+test('the better cell from the supply drop makes the flashlight last longer', () => {
+  const plain = setup(night2).state;
+  const better = createState(night2, { inventory: { batteries: 1 } });
+  assert.ok(flashlightDrain(better) < flashlightDrain(plain));
 });

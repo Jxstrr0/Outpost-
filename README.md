@@ -14,6 +14,7 @@ You are the lone keeper of an arctic weather station for five nights. Keep the g
 | Move | Left thumb, anywhere on the left half | WASD or arrow keys |
 | Look | Drag on the right half | Mouse (click the game first) |
 | Use | USE button | E or left click |
+| Flashlight (night 2 on) | TORCH button, above USE | F |
 | Pause | II button, top centre | Esc |
 
 ## Where things are

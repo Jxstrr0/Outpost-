@@ -42,6 +42,7 @@ export function attachDesktopInput(canvas, input, hooks) {
       e.preventDefault();
     }
     if (e.code === 'KeyE' && !e.repeat) pressUse();
+    if (e.code === 'KeyF' && !e.repeat) input.torchPressed = true;
     if (e.code === 'Escape' && !locked) hooks.onPause();
   });
 

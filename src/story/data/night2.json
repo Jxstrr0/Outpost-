@@ -5,6 +5,11 @@
   "start": { "power": 64, "fuel": 26, "temp": 6 },
   "jerryCans": 2,
   "systems": [],
+  "flashlight": true,
+  "newTonight": [
+    "A flashlight. Press F, or the TORCH button above USE. It recharges from station power while it is off.",
+    "The supply room is open, through the generator room. The airlock beyond it leads back to the main room."
+  ],
   "doors": { "supply": "closed", "airlockInner": "closed", "airlockSide": "closed" },
   "failures": { "generatorStall": 1.25, "breakerTrip": 1.2 },
   "readings": [

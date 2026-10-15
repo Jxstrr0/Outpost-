@@ -8,6 +8,7 @@ import { updateFuel } from './fuel.js';
 import { updateHeat } from './heat.js';
 import { updateDuties } from './duties.js';
 import { updateSanity } from './sanity.js';
+import { updateFlashlight } from './flashlight.js';
 
 /** Game minutes simulated by one fixed tick. */
 export const TICK_MINUTES = CONFIG.time.gameMinutesPerSecond / CONFIG.time.ticksPerSecond;
@@ -25,6 +26,7 @@ export function stepSimulation(state, ctx, dt = TICK_MINUTES) {
   updateFuel(state, dt, ctx);
   updateHeat(state, dt, ctx);
   updateDuties(state, dt, ctx);
+  updateFlashlight(state, dt, ctx);
   updateSanity(state, dt, ctx);
 }
 
@@ -32,6 +34,7 @@ export function stepSimulation(state, ctx, dt = TICK_MINUTES) {
 export function setMeter(state, key, value) {
   if (key === 'power') state.power = Math.min(100, Math.max(0, value));
   if (key === 'fuel') state.fuel = Math.min(100, Math.max(0, value));
+  if (key === 'battery') state.flashlight.battery = Math.min(100, Math.max(0, value));
   if (key === 'temp') {
     state.temp = Math.min(CONFIG.heat.max, Math.max(CONFIG.heat.min, value));
     state.lowestTemp = Math.min(state.lowestTemp, state.temp);
@@ -51,4 +54,5 @@ export * from './fuel.js';
 export * from './failures.js';
 export * from './duties.js';
 export * from './doors.js';
+export * from './flashlight.js';
 export { jumpTo } from './time.js';

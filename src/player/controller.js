@@ -13,14 +13,16 @@ export function createInputState() {
     lookY: 0,
     useDown: false,
     usePressed: false, // true for one frame when Use goes down
+    torchPressed: false, // true for one frame when the flashlight key or button is pressed
     consumeFrame() {
       this.lookX = 0;
       this.lookY = 0;
       this.usePressed = false;
+      this.torchPressed = false;
     },
     reset() {
       this.moveX = this.moveY = this.lookX = this.lookY = 0;
-      this.useDown = this.usePressed = false;
+      this.useDown = this.usePressed = this.torchPressed = false;
     },
   };
 }

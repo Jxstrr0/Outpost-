@@ -23,6 +23,7 @@ function makeCan() {
   box(can, 0.175, 0.03, 0.345, mat(PALETTE.redDark), 0, 0.12, 0); // pressed rib
   box(can, 0.06, 0.05, 0.2, mat(PALETTE.orange), 0, 0.43, -0.03); // handle
   box(can, 0.05, 0.08, 0.05, mat(PALETTE.yellow), 0, 0.43, 0.13); // spout
+  can.children.forEach((m) => (m.castShadow = true));
   return can;
 }
 
