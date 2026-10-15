@@ -1,0 +1,18 @@
+{
+  "fuel": {
+    "name": "Fuel cans",
+    "text": "Two extra jerry cans in the generator room."
+  },
+  "fuses": {
+    "name": "Heater fuses",
+    "text": "Two spare fuses, for when the heater grille goes dark on its own."
+  },
+  "food": {
+    "name": "Proper food",
+    "text": "Tinned stew and chocolate. Keeps your head clear on the long nights."
+  },
+  "battery": {
+    "name": "Flashlight battery",
+    "text": "A better cell for the flashlight. Lasts longer in the cold."
+  }
+}
