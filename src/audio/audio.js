@@ -467,6 +467,10 @@ export function createAudio(camera, scene, anchors, events, hooks = {}) {
   });
   events.on('reading:logged', () => play('confirm', 'console'));
   events.on('note:found', () => play('rustle', 'player'));
+  events.on('tape:found', () => {
+    play('click', 'player');
+    play('staticBurst', 'player');
+  });
   events.on('can:pickedUp', () => play('lift', 'player'));
   events.on('door:opened', ({ id }) => atDoor(id, 'doorOpen'));
   events.on('door:closed', ({ id }) => atDoor(id, 'doorClose'));

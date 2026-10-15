@@ -50,8 +50,19 @@
       "anomaly": true
     }
   ],
-  "logs": [],
-  "notes": [],
+  "logs": [
+    "v16",
+    "v17",
+    "v18",
+    "v19",
+    "v20"
+  ],
+  "notes": [
+    {
+      "id": "n07",
+      "spot": "windowSill"
+    }
+  ],
   "radio": [
     {
       "id": "n4a",
@@ -68,5 +79,12 @@
   ],
   "scripted": [],
   "shedCans": 2,
-  "mastInspection": true
+  "mastInspection": true,
+  "station": {
+    "mug": "windowSill",
+    "mugText": "Hollis's mug, on the sill under the handprints. There's frost on the inside of it.",
+    "bedroll": true,
+    "handprints": true,
+    "lockerOpen": true
+  }
 }

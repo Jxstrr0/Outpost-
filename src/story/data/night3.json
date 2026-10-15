@@ -51,8 +51,23 @@
       "time": "04:00"
     }
   ],
-  "logs": [],
-  "notes": [],
+  "logs": [
+    "v11",
+    "v12",
+    "v13",
+    "v14",
+    "v15"
+  ],
+  "notes": [
+    {
+      "id": "n05",
+      "spot": "bedroll"
+    },
+    {
+      "id": "n06",
+      "spot": "shedWall"
+    }
+  ],
   "radio": [
     {
       "id": "n3a",
@@ -70,5 +85,15 @@
     }
   ],
   "shedCans": 2,
-  "mastInspection": true
+  "mastInspection": true,
+  "tape": {
+    "id": "t3",
+    "spot": "recorderShelf",
+    "turn": 1.6
+  },
+  "station": {
+    "mug": "bedroll",
+    "mugText": "Hollis's mug, on the floor by Vance's bedroll. It's still warm.",
+    "bedroll": true
+  }
 }

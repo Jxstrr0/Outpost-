@@ -1,0 +1,115 @@
+{
+  "t1": {
+    "title": "Tape 1 · R. Vance · Day 2",
+    "lines": [
+      {
+        "who": "Vance",
+        "text": "Testing. Right. Day two at Kestrel-4. Dispatch wants a spoken log as well as the written one, so this is the spoken log."
+      },
+      {
+        "who": "Vance",
+        "text": "The generator's a beast and the breaker's worse. The view from the north window is nothing at all, which I'm told is the point."
+      },
+      {
+        "who": "Vance",
+        "text": "Hollis's mug is still on its hook. I've left it there. Felt rude to move it."
+      },
+      {
+        "who": "",
+        "text": "(click)"
+      }
+    ]
+  },
+  "t2": {
+    "title": "Tape 2 · R. Vance · Day 8",
+    "lines": [
+      {
+        "who": "Vance",
+        "text": "Day eight. I'm recording this because I want a voice in the room that isn't the generator."
+      },
+      {
+        "who": "Vance",
+        "text": "I asked Imogen for Hollis's file. She says there isn't one. Eighteen months on station and no file."
+      },
+      {
+        "who": "Vance",
+        "text": "Tracks again this morning, up to the west door. I'm not going out to look at them. I'm saying that on tape so it counts."
+      },
+      {
+        "who": "",
+        "text": "(click)"
+      }
+    ]
+  },
+  "t3": {
+    "title": "Tape 3 · R. Vance · Day 14",
+    "lines": [
+      {
+        "who": "Vance",
+        "text": "(wind, very close to the microphone) Day fourteen. Outside, on the tether. I'm recording because if I'm talking, I'm not listening."
+      },
+      {
+        "who": "Vance",
+        "text": "Post four. Post five. There's... no. Keep walking."
+      },
+      {
+        "who": "",
+        "text": "(footsteps in the snow, two sets, not quite in time)"
+      },
+      {
+        "who": "Vance",
+        "text": "At the mast. North gauge twelve under. Heading back now. Not turning round. Not turning round."
+      },
+      {
+        "who": "",
+        "text": "(click)"
+      }
+    ]
+  },
+  "t4": {
+    "title": "Tape · Hollis · undated",
+    "lines": [
+      {
+        "who": "Hollis",
+        "text": "Kestrel-4, keeper Hollis. Day... a hundred and something. Just gone three."
+      },
+      {
+        "who": "Hollis",
+        "text": "For the record, since the Service likes a record: it knocked three times again. I've decided it's polite. It always waits to be asked."
+      },
+      {
+        "who": "Hollis",
+        "text": "Imogen says the pressure data is the best they've ever had. She says I'm doing important work. She says it the way you'd talk to a horse."
+      },
+      {
+        "who": "Hollis",
+        "text": "If you've found this, I expect I've gone to have a look. Don't come after me. It's warm out there, it says. I expect that's true."
+      },
+      {
+        "who": "",
+        "text": "(click)"
+      }
+    ]
+  },
+  "t5": {
+    "title": "Tape 5 · R. Vance · Day 19",
+    "lines": [
+      {
+        "who": "Vance",
+        "text": "Last tape. The real Imogen called at nine. Relief flight at six, she said. She sounded tired. She sounded like a person."
+      },
+      {
+        "who": "Vance",
+        "text": "The other one called at ten to three. It sounded better than her."
+      },
+      {
+        "who": "Vance",
+        "text": "Whoever you are: the door. Only the door. Whatever it says, wherever the light is. Six o'clock. You can do it. I nearly could."
+      },
+      {
+        "who": "",
+        "text": "(click)"
+      }
+    ]
+  }
+}

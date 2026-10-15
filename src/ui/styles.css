@@ -1028,3 +1028,18 @@ h2 {
 .panel.radio .panel-head {
   border-color: #2c4a5a;
 }
+
+/* ---------- Recorder tape: a transcript in warm amber ---------- */
+
+.panel.tape {
+  color: #ecd9b8;
+  border-color: #5a4426;
+}
+
+.panel.tape .panel-head {
+  border-color: #5a4426;
+}
+
+.panel.tape .radio-end {
+  margin: 0 0 12px;
+}

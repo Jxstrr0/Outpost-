@@ -70,6 +70,7 @@ export function buildSupplyRoom(b) {
   });
   b.interactable('radio', hitbox(g, 0.7, 0.8, 1.2, 1.4, 1.0, 7.95));
   b.anchor('radio', 1.4, 0.95, 7.95);
+  b.anchor('radioDesk', 1.55, 0.785, 7.45); // note and tape spot, by the call log
 
   // --- Ceiling fixture ---
   k.box(1.0, 0.08, 0.3, C.steelDark, 3.0, 2.75, 7.0, { shade: 0 });

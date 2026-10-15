@@ -64,6 +64,9 @@ export function buildGeneratorRoom(b) {
   d.floor('blobLong', 0.9, 3.6, 4.6, 0.475);
   b.anchor('cans', 4.5, 0.3, 0.5);
   b.anchor('jerrycans', 4.5, 0.1, 2.05); // note spot, by the last can
+  // Vance's bedroll (from night 3) lies along the pallet; a note can lie on it.
+  b.anchor('bedroll', 3.85, 0.13, 0.2);
+  b.anchor('mugBedroll', 3.35, 0, 1.3);
 
   // --- Crates stacked by the supply door ---
   k.at(4.55, 0, 2.8, 0.1, () => {
@@ -81,6 +84,7 @@ export function buildGeneratorRoom(b) {
     b.footprint(1.0, 0.36, 1.3);
   });
   b.interactable('recorderShelf', hitbox(g, 0.6, 1.4, 1.1, 4.7, 0.7, -4.4));
+  b.anchor('recorderShelf', 4.75, 0.625, -4.4); // where the recorder turns up again
 
   // --- Workbench on the south wall ---
   k.at(1.8, 0, 4.58, S, () => {

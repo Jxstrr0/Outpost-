@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 
 import { CONFIG } from '../src/config.js';
 import { createState } from '../src/core/state.js';
@@ -32,6 +32,7 @@ import {
   startGust,
   inspectMast,
   clearAntenna,
+  recordTape,
 } from '../src/systems/index.js';
 import { doorDraft } from '../src/systems/heat.js';
 import { attachScripted } from '../src/story/scripted.js';
@@ -485,4 +486,53 @@ test('inspecting the mast happens once and sets off the second set of footprints
   assert.equal(inspectMast(state, ctx), false);
   assert.ok(log.includes('mast:inspected'));
   assert.ok(log.includes('scripted:footprints'));
+});
+
+const LOGS = JSON.parse(readFileSync(new URL('../src/story/data/logs.json', import.meta.url)));
+const NOTES = JSON.parse(readFileSync(new URL('../src/story/data/notes.json', import.meta.url)));
+const TAPES = JSON.parse(readFileSync(new URL('../src/story/data/tapes.json', import.meta.url)));
+
+/** Every anchor name the world builds, read straight from the source. */
+function worldAnchors() {
+  const names = new Set();
+  const dirs = ['../src/world/', '../src/world/rooms/'];
+  for (const dir of dirs) {
+    for (const file of readdirSync(new URL(dir, import.meta.url))) {
+      if (!file.endsWith('.js')) continue;
+      const src = readFileSync(new URL(dir + file, import.meta.url), 'utf8');
+      for (const m of src.matchAll(/b\.anchor\('([^']+)'/g)) names.add(m[1]);
+    }
+  }
+  return names;
+}
+
+test('every night has a log per reading, and every log, note and tape exists and has a place', () => {
+  const anchors = worldAnchors();
+  const seen = new Set();
+  for (const night of [night1, night2, night3, night4, night5]) {
+    assert.equal(night.logs.length, night.readings.length, `night ${night.night} logs`);
+    for (const id of night.logs) {
+      assert.ok(LOGS[id], `log ${id}`);
+      assert.ok(!seen.has(id), `log ${id} used twice`);
+      seen.add(id);
+      assert.ok(LOGS[id].text.split(/\s+/).length <= 60, `log ${id} is over 60 words`);
+    }
+    for (const note of night.notes) {
+      assert.ok(NOTES[note.id], `note ${note.id}`);
+      assert.ok(anchors.has(note.spot), `note spot ${note.spot}`);
+    }
+    if (night.tape) {
+      assert.ok(TAPES[night.tape.id], `tape ${night.tape.id}`);
+      assert.ok(anchors.has(night.tape.spot), `tape spot ${night.tape.spot}`);
+    }
+  }
+  for (const note of Object.values(NOTES)) assert.ok(note.text.split(/\s+/).length <= 60);
+});
+
+test('a tape counts once, however many times it is played', () => {
+  const { state, ctx, log } = setup(night3);
+  assert.equal(recordTape(state, ctx, 't3'), true);
+  assert.equal(recordTape(state, ctx, 't3'), false);
+  assert.deepEqual(state.tapesFound, ['t3']);
+  assert.equal(log.filter((e) => e === 'tape:found').length, 1);
 });

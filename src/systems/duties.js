@@ -70,4 +70,12 @@ export function recordNote(state, { events }, noteId) {
   return true;
 }
 
+/** Playing the tape left on Vance's recorder. */
+export function recordTape(state, { events }, tapeId) {
+  if (state.tapesFound.includes(tapeId)) return false;
+  state.tapesFound.push(tapeId);
+  events.emit('tape:found', { id: tapeId });
+  return true;
+}
+
 export const READING_WINDOW = CONFIG.duties.readingWindow;

@@ -4,6 +4,9 @@ import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { describeAction, performAction } from './actions.js';
 
+// Small things lying on furniture win over the furniture's own interaction box.
+const PICKUPS = new Set(['note', 'tape', 'mug']);
+
 function visibleInScene(object) {
   for (let o = object; o; o = o.parent) if (!o.visible) return false;
   return true;
@@ -25,11 +28,21 @@ export function createInteractor(camera, station) {
       raycaster.setFromCamera(center, camera);
       const targets = [...station.occluders, ...station.interactables.map((i) => i.hitbox)];
       const hits = raycaster.intersectObjects(targets, false);
+      // The nearest thing wins, except that small pickups lying on furniture are found
+      // through the furniture's own box (and a little way past its blocker).
       let found = null;
+      let blockedAt = null;
       for (const hit of hits) {
         if (!visibleInScene(hit.object)) continue;
-        found = hit.object.userData.interactable || null;
-        break;
+        const entry = hit.object.userData.interactable;
+        if (blockedAt === null && !entry) blockedAt = hit.distance;
+        if (blockedAt !== null && hit.distance > blockedAt + CONFIG.player.pickupThroughProps) break;
+        if (!entry) continue;
+        if (PICKUPS.has(entry.kind)) {
+          found = entry;
+          break;
+        }
+        if (!found && blockedAt === null) found = entry;
       }
       this.target = found;
       this.action = found ? describeAction(found, game.state) : null;

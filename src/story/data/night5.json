@@ -51,8 +51,23 @@
       "anomaly": true
     }
   ],
-  "logs": [],
-  "notes": [],
+  "logs": [
+    "v21",
+    "v22",
+    "v23",
+    "v24",
+    "v25"
+  ],
+  "notes": [
+    {
+      "id": "n09",
+      "spot": "mastBox"
+    },
+    {
+      "id": "n10",
+      "spot": "radioDesk"
+    }
+  ],
   "radio": [
     {
       "id": "n5a",
@@ -76,5 +91,16 @@
       45,
       90
     ]
+  },
+  "tape": {
+    "id": "t5",
+    "spot": "airlockHook"
+  },
+  "station": {
+    "mug": "westDoor",
+    "mugText": "Hollis's mug, on the floor in front of the west door, handle turned toward you. Placed, not dropped.",
+    "bedroll": true,
+    "handprints": true,
+    "lockerOpen": true
   }
 }

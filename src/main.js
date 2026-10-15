@@ -313,6 +313,7 @@ function handleOutcome() {
   const { state, night } = game;
   rememberFound('logsFound', state.logsRecovered);
   rememberFound('notesFound', state.notesFound);
+  rememberFound('tapesFound', state.tapesFound);
   rememberFound('radioTags', state.radio.tags);
   if (state.radio.said.length) updateSave({ radioSaid: [...(getSave().radioSaid || []), ...state.radio.said].slice(-5) });
   input.reset();

@@ -236,6 +236,7 @@ function buildMast(k, b) {
   k.box(2.0, 0.05, 0.05, 0x8a96a0, x, 6.2, z);
   for (const s of [-1, 1]) k.box(0.04, 0.8, 0.04, 0x8a96a0, x + s * 0.95, 6.2, z);
   b.anchor('mast', x, 1.4, z + 0.62);
+  b.anchor('mastBox', x - 0.1, 1.73, z + 0.62); // note spot, on the instrument box hood
   b.anchor('mastTop', x, H, z);
   b.anchor('antenna', x, 6.2, z);
   b.block(x - 0.7, x + 0.7, z - 0.7, z + 0.55, 3);
@@ -261,6 +262,7 @@ function buildShed(k, b) {
   k.at(10.4, 0, -2.45, 0, () => P.pallet(k, 0.9, 2.3));
   k.box(0.04, 0.3, 0.6, C.paper, 11.0, 1.6, -0.9, { shade: 0 }); // a stock list, nailed up
   b.anchor('shed', 9.5, 1.2, -2);
+  b.anchor('shedWall', 10.975, 1.3, -1.45); // note spot, pinned to the back wall
 }
 
 /** Falling snow in a box that follows the player. Only drawn outside. */

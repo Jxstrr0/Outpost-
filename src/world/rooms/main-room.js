@@ -42,6 +42,7 @@ export function buildMainRoom(b) {
   b.anchor('metScreen', -6.5, 1.2, 1.135);
   b.interactable('metConsole', hitbox(g, 1.7, 1.8, 0.9, -6.5, 0.9, 1.35));
   b.anchor('metconsole', -6.0, 0.795, 1.55); // note spot
+  b.anchor('mugConsole', -6.3, 0.79, 1.62);
   k.at(-7.55, 0, 2.05, 0.5, () => {
     P.chair(k);
     b.footprint(0.4, 0.4, 0.9);
@@ -152,6 +153,8 @@ export function buildMainRoom(b) {
     b.footprint(2.24, 0.62, 2.2);
   });
   d.floor('blobLong', 2.6, 0.9, -1.5, -4.6);
+  b.anchor('mugKitchen', -1.25, 0.91, -4.55);
+  b.anchor('lockerOpen', -10.1, 0, -4.465); // the middle locker's door, when it stands open
 
   // --- North window, clock, corkboard ---
   const win = new THREE.Mesh(
@@ -169,6 +172,8 @@ export function buildMainRoom(b) {
     k.box(0.4, 0.02, 0.15, C.paper, 0.6, 1.06, 0.05, { ry: 0.3, shade: 0 }); // notebook on the sill
   });
   b.anchor('window', -4.5, 1.55, -4.9);
+  b.anchor('windowSill', -4.35, 1.056, -4.8); // note spot
+  b.anchor('mugSill', -5.1, 1.05, -4.8);
   b.interactable('window', hitbox(g, 1.8, 1.0, 0.3, -4.5, 1.55, -4.75));
   d.add('signStation', 1.2, 0.3, -4.5, 2.36, -4.88);
   k.at(-6.6, 2.1, -4.9, 0, () => P.clockRim(k));
@@ -199,6 +204,7 @@ export function buildMainRoom(b) {
   k.box(0.02, 2.0, 0.04, 0xb8c4cc, -10.86, 1.05, -2.94, { shade: 0 }); // frost on the seal
   b.interactable('westDoor', hitbox(g, 0.4, 2.1, 1.1, -10.8, 1.05, -2.4));
   b.anchor('westDoor', -10.8, 1.2, -2.4);
+  b.anchor('mugWestDoor', -10.45, 0, -2.4);
   const exit = new THREE.Mesh(
     new THREE.BoxGeometry(0.02, 0.12, 0.4),
     new THREE.MeshLambertMaterial({ color: 0x2b6b3a, emissive: 0x1d7a35, emissiveIntensity: 0.7 })

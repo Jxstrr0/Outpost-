@@ -10,6 +10,7 @@ import {
   pickUpCan,
   pourCan,
   recordNote,
+  recordTape,
   openReading,
   useDoor,
   nextSupply,
@@ -67,6 +68,10 @@ export function describeAction(entry, state) {
       return { label: 'Read the keeper log' };
     case 'note':
       return { label: 'Read the note' };
+    case 'tape':
+      return { label: state.tapesFound.includes(entry.data.tapeId) ? 'Play the tape again' : "Play the tape in Vance's recorder" };
+    case 'mug':
+      return { label: "Hollis's mug" };
     case 'westDoor':
       return { label: 'West door' };
     case 'door': {
@@ -142,6 +147,13 @@ export function performAction(entry, game) {
     case 'note':
       recordNote(state, ctx, entry.data.noteId);
       ui.openPanel('note', { id: entry.data.noteId });
+      break;
+    case 'tape':
+      recordTape(state, ctx, entry.data.tapeId);
+      ui.openPanel('tape', { id: entry.data.tapeId });
+      break;
+    case 'mug':
+      if (entry.data.text) ctx.events.emit('flavour', { text: entry.data.text });
       break;
     case 'westDoor':
       ctx.events.emit('flavour', { text: 'Frozen into its frame. Minus thirty out there, and nothing worth going out for.' });
