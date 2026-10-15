@@ -12,10 +12,20 @@ import {
   recordNote,
   openReading,
   useDoor,
+  nextSupply,
+  takeSupply,
+  replaceFuse,
+  sealWindow,
+  thawFuelLine,
+  ringingCall,
+  openCall,
+  answerCall,
 } from '../systems/index.js';
+
+const R = CONFIG.repairs;
 import DOORS from '../story/data/doors.json';
 
-/** @returns {{ label: string, disabled?: boolean, hold?: boolean } | null} */
+/** @returns {{ label: string, disabled?: boolean, hold?: boolean, holdSeconds?: number } | null} */
 export function describeAction(entry, state) {
   switch (entry.kind) {
     case 'generator': {
@@ -26,6 +36,11 @@ export function describeAction(entry, state) {
       if (gen.cranking > 0) return { label: 'Cranking...', disabled: true };
       if (state.fuel <= 0) return { label: 'Tank empty: bring a jerry can', disabled: true };
       if (gen.stalled) return { label: 'Restart the generator' };
+      if (state.fuelLineFrozen) {
+        return state.pocket.heatGun
+          ? { label: 'Hold to thaw the fuel line', hold: true, holdSeconds: R.thawSeconds }
+          : { label: 'Fuel line frozen: fetch the heat gun', disabled: true };
+      }
       if (gen.running) return { label: 'Stop the generator' };
       return { label: 'Start the generator' };
     }
@@ -37,6 +52,11 @@ export function describeAction(entry, state) {
     case 'lightSwitch':
       return { label: state.lightsOn ? 'Switch the lights off' : 'Switch the lights on' };
     case 'heater':
+      if (state.heaterFuseBlown) {
+        return state.pocket.fuse
+          ? { label: 'Hold to replace the blown fuse', hold: true, holdSeconds: R.fuseSeconds }
+          : { label: 'Fuse blown: spares in the supply room', disabled: true };
+      }
       if (!state.heaterOn) return { label: 'Turn the heater on' };
       return { label: state.heaterActive ? 'Turn the heater off' : 'Turn the heater off (no power)' };
     case 'metConsole':
@@ -55,9 +75,16 @@ export function describeAction(entry, state) {
       return { label: s === 'open' ? `Close the door` : `Open: ${name}` };
     }
     case 'supplies':
-      return { label: 'Check the supplies' };
+      return { label: nextSupply(state)?.label ?? 'Check the supplies' };
     case 'radio':
+      if (ringingCall(state)) return { label: 'Answer the radio' };
+      if (openCall(state)) return { label: 'Back to the call' };
       return { label: 'Radio set' };
+    case 'window':
+      if (!state.windowCracked) return { label: 'North window', disabled: true };
+      return state.pocket.tape
+        ? { label: 'Hold to tape over the crack', hold: true, holdSeconds: R.tapeSeconds }
+        : { label: 'Cracked: seal tape is in the supply room', disabled: true };
     case 'bunk':
       return { label: 'Your bunk' };
     case 'recorderShelf':
@@ -76,6 +103,7 @@ export function performAction(entry, game) {
   switch (entry.kind) {
     case 'generator':
       if (state.carrying) pourCan(state, ctx);
+      else if (state.fuelLineFrozen && state.pocket.heatGun && !state.generator.stalled) thawFuelLine(state, ctx);
       else if (state.generator.running) stopGenerator(state, ctx);
       else startGenerator(state, ctx);
       break;
@@ -89,7 +117,11 @@ export function performAction(entry, game) {
       toggleLights(state, ctx);
       break;
     case 'heater':
-      toggleHeater(state, ctx);
+      if (state.heaterFuseBlown) replaceFuse(state, ctx);
+      else toggleHeater(state, ctx);
+      break;
+    case 'window':
+      sealWindow(state, ctx);
       break;
     case 'metConsole':
       ui.openPanel('console');
@@ -111,15 +143,19 @@ export function performAction(entry, game) {
       useDoor(state, ctx, entry.data.doorId);
       break;
     case 'supplies': {
+      if (takeSupply(state, ctx)) break;
       const inv = state.inventory;
       ctx.events.emit('flavour', {
-        text: `Spare fuses: ${inv.fuses}. Rations: ${inv.food}. Flashlight cells: ${inv.batteries}. Seal tape, a heat gun, filters.`,
+        text: `Spare fuses: ${inv.fuses}. Seal tape: ${inv.tape}. Rations: ${inv.food}. Flashlight cells: ${inv.batteries}. The heat gun, filters.`,
       });
       break;
     }
-    case 'radio':
-      ctx.events.emit('flavour', { text: 'The radio set hums on standby. Nothing on the channel tonight.' });
+    case 'radio': {
+      const call = ringingCall(state) ? answerCall(state, ctx) : openCall(state);
+      if (call) ui.openPanel('radio', { id: call.id });
+      else ctx.events.emit('flavour', { text: 'The radio set hums on standby. Nothing on the channel.' });
       break;
+    }
     case 'bunk':
       ctx.events.emit('flavour', { text: 'No sleeping on shift.' });
       break;

@@ -22,12 +22,14 @@ export const CONFIG = {
     lightsLoad: 0.06,
     heaterLoad: 0.2,
     unstableBelow: 25, // lights flicker under this, or while the generator is off
+    frozenLineCharge: 0.6, // charge multiplier while a frozen fuel line makes the engine sputter
     dangerBelow: 20, // HUD meter turns red
   },
 
   fuel: {
     burn: 0.12,
     canAmount: 30,
+    frozenLineBurn: 2.5, // burn multiplier while the fuel line is frozen
     dangerBelow: 15,
   },
 
@@ -44,6 +46,7 @@ export const CONFIG = {
     dangerBelow: 0,
     frostStartsBelow: 5, // screen-edge frost begins
     frostFullAt: -10,
+    crackCooling: 2, // a cracked window makes the station lose heat this many times faster
   },
 
   failures: {
@@ -52,6 +55,48 @@ export const CONFIG = {
     restartFailChance: 0.3,
     crankMinutes: 2.4, // how long one restart attempt takes
     graceMinutes: 20, // no random failures this soon after 18:00
+    // Faults from night 2 on. They only happen on nights whose JSON gives them a weight.
+    heaterFaultEvery: 520, // the heater blows a fuse
+    fuelLineEvery: 420, // the fuel line freezes while the generator runs
+    windowCrackEvery: 520, // the north window cracks
+  },
+
+  repairs: {
+    // Seconds of holding Use. These count real time, so the night keeps moving while you work.
+    fuseSeconds: 1.5,
+    tapeSeconds: 4,
+    thawSeconds: 10,
+  },
+
+  stock: {
+    // What the supply room holds at the start of a night, before the supply drop adds to it.
+    // A night's JSON can override these.
+    spareFuses: 2,
+    tape: 2,
+    rations: 1,
+  },
+
+  radio: {
+    ringMinutes: 40, // game minutes a call keeps ringing before Dispatch gives up
+    ringEvery: 3, // real seconds between rings
+  },
+
+  sanity: {
+    // Night 3 on. Per game minute unless noted.
+    darkLoss: 0.11, // standing somewhere unlit
+    flashlightDarkFactor: 0.5, // the flashlight halves the dark's effect
+    coldLoss: 0.06, // inside temperature below 0 °C
+    lightGain: 0.03, // standing in a lit room
+    warmGain: 0.02, // inside temperature 10 °C or more
+    readingBonus: 5, // logging a weather reading
+    radioBonus: 4, // answering a radio call
+    rationBonus: 12, // eating a ration
+    rationMinutes: 90, // and for this long afterwards, losses are slowed
+    rationLossFactor: 0.5,
+    hallucinateBelow: 30, // sounds and HUD alerts that aren't real
+    hallucinationEvery: 22, // average game minutes between them
+    dangerBelow: 30,
+    shocks: { knocks: 8, roofSteps: 6, anomaly: 10, radioEcho: 8 }, // scripted moments
   },
 
   duties: {
@@ -131,6 +176,9 @@ export const CONFIG = {
     creakEvery: [14, 40], // seconds between building creaks, min and max
     groanEvery: [35, 80], // distant metal groans outside
     groanDistance: 14, // metres from the station centre
+    crackWindBoost: 1.8, // the wind is this much louder with the north window cracked
+    sputterEvery: [3, 6], // a frozen fuel line makes the engine sputter this often (seconds)
+    glassTickEvery: [5, 11], // a cracked window ticks in the cold
   },
 
   lighting: {

@@ -45,8 +45,9 @@ export function createInteractor(camera, station) {
         if (input.useDown && (holdTarget === found || input.usePressed)) {
           holdTarget = found;
           holdTime += dt;
-          this.holdProgress = Math.min(1, holdTime / CONFIG.player.holdToUseSeconds);
-          if (holdTime >= CONFIG.player.holdToUseSeconds) {
+          const needed = this.action.holdSeconds ?? CONFIG.player.holdToUseSeconds;
+          this.holdProgress = Math.min(1, holdTime / needed);
+          if (holdTime >= needed) {
             holdTime = 0;
             holdTarget = null;
             this.holdProgress = 0;

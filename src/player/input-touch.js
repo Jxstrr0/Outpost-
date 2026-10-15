@@ -114,6 +114,9 @@ export function attachTouchInput(root, input, hooks) {
   };
   useBtn.addEventListener('pointerup', endUse);
   useBtn.addEventListener('pointercancel', endUse);
+  // Stop the browser's follow-up click: USE can open a panel, and that click would
+  // land on whatever button the panel puts under the finger.
+  useBtn.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
 
   torchBtn.addEventListener('pointerdown', (e) => {
     e.preventDefault();

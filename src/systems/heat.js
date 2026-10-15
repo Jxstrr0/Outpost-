@@ -6,7 +6,7 @@ const H = CONFIG.heat;
 export function updateHeat(state, dt, { events }) {
   const heating = state.heaterActive;
   const target = heating ? H.heaterTarget : H.coldTarget;
-  const rate = heating ? H.heatingRate : H.coolingRate;
+  const rate = heating ? H.heatingRate : H.coolingRate * (state.windowCracked ? H.crackCooling : 1);
   const k = 1 - Math.pow(1 - rate, dt);
   state.temp = Math.min(H.max, Math.max(H.min, state.temp + (target - state.temp) * k));
   state.lowestTemp = Math.min(state.lowestTemp, state.temp);

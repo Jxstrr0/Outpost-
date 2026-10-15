@@ -2,7 +2,7 @@
 
 import { CONFIG } from '../config.js';
 import { formatClock } from '../core/clock.js';
-import { openReading, nextUpcomingReading, fullCansLeft } from '../systems/index.js';
+import { openReading, nextUpcomingReading, fullCansLeft, ringingCall } from '../systems/index.js';
 
 function el(tag, className, parent, html = '') {
   const e = document.createElement(tag);
@@ -33,6 +33,13 @@ export function computeObjective(state) {
   if (state.breakerTripped) {
     return { text: 'Reset the breaker', where: 'Generator room, beside the doorway', urgent: true };
   }
+  if (state.heaterFuseBlown && state.heaterOn) {
+    return state.pocket.fuse
+      ? { text: 'Replace the heater fuse', where: 'Main room, west wall. Hold USE', urgent: true }
+      : state.inventory.fuses > 0
+        ? { text: 'The heater fuse has blown', where: 'Spare fuses: supply room shelves', urgent: true }
+        : { text: 'No spare fuses left', where: 'Keep warm some other way: lights on, keep moving', urgent: true };
+  }
   if (state.carrying) {
     return { text: 'Pour the fuel into the generator', where: 'Generator room', urgent: state.fuel <= 0 };
   }
@@ -46,6 +53,22 @@ export function computeObjective(state) {
   }
   if (freezing && state.power <= 0) {
     return { text: 'You are freezing. Get power back', where: 'Start the generator', urgent: true };
+  }
+  const call = ringingCall(state);
+  if (call) {
+    return { text: 'Answer the radio', where: `Supply room. Rings until ${formatClock(call.closes)}`, urgent: call.closes - state.minute < 15 };
+  }
+  if (state.windowCracked) {
+    return state.pocket.tape
+      ? { text: 'Tape over the cracked window', where: 'North window, main room. Hold USE', urgent: true }
+      : state.inventory.tape > 0
+        ? { text: 'The north window has cracked', where: 'Seal tape: supply room shelves', urgent: true }
+        : { text: 'Out of tape. The window stays cracked', where: 'Keep the heater running', urgent: false };
+  }
+  if (state.fuelLineFrozen && state.generator.running) {
+    return state.pocket.heatGun
+      ? { text: 'Thaw the frozen fuel line', where: 'Generator room. Hold USE for 10 seconds', urgent: false }
+      : { text: 'The fuel line is freezing', where: 'Heat gun: supply room shelves', urgent: false };
   }
   const reading = openReading(state);
   if (reading) {
@@ -86,12 +109,15 @@ export function createHud(root) {
   const fuel = meter(status, 'FUEL');
   const temp = meter(status, 'TEMP');
   const torch = meter(status, 'TORCH');
+  const mind = meter(status, 'NERVES');
+  const pocket = el('div', 'hud-pocket', status);
 
   const objective = el('div', 'hud-objective', hud);
   const objMain = el('div', 'hud-objective-main', objective);
   const objWhere = el('div', 'hud-objective-where', objective);
 
   const crosshair = el('div', 'crosshair', hud);
+  const ring = el('div', 'hold-ring', hud);
   const label = el('div', 'interact-label', hud);
   const desktopHint = el('div', 'desktop-hint hidden', hud, 'Click to look around');
   const rotateHint = el('div', 'rotate-hint', hud, 'Turn your phone sideways for the best view');
@@ -123,6 +149,11 @@ export function createHud(root) {
       const fl = state.flashlight;
       torch.row.classList.toggle('hidden', !fl.owned);
       if (fl.owned) setMeter(torch, fl.battery, fl.on ? `${Math.round(fl.battery)}%` : 'off', fl.battery < CONFIG.flashlight.lowBelow);
+      mind.row.classList.toggle('hidden', !state.sanityEnabled);
+      if (state.sanityEnabled) setMeter(mind, state.sanity, `${Math.round(state.sanity)}`, state.sanity < CONFIG.sanity.dangerBelow);
+      const held = [state.pocket.fuse && 'fuse', state.pocket.tape && 'tape', state.pocket.heatGun && 'heat gun'].filter(Boolean);
+      const pocketText = held.length ? `Pockets: ${held.join(', ')}` : '';
+      if (pocket.textContent !== pocketText) pocket.textContent = pocketText;
 
       const obj = computeObjective(state);
       const text = `${obj.text}|${obj.where}|${obj.urgent}`;
@@ -141,6 +172,9 @@ export function createHud(root) {
       crosshair.classList.toggle('disabled', !!action && !!action.disabled);
       label.textContent = action ? action.label : '';
       label.classList.toggle('disabled', !!action?.disabled);
+      const progress = interactor.holdProgress || 0;
+      ring.style.setProperty('--p', String(progress));
+      ring.classList.toggle('on', progress > 0);
     },
   };
 }

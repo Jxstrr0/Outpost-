@@ -8,13 +8,13 @@ export function updatePower(state, dt, { events, rng }) {
 
   const circuitLive = !state.breakerTripped && state.power > 0;
   state.lightsLit = state.lightsOn && circuitLive;
-  state.heaterActive = state.heaterOn && circuitLive;
+  state.heaterActive = state.heaterOn && circuitLive && !state.heaterFuseBlown;
   state.consolesPowered = circuitLive;
 
   let delta = -P.baseLoad;
   if (state.lightsLit) delta -= P.lightsLoad;
   if (state.heaterActive) delta -= P.heaterLoad;
-  if (state.generator.running) delta += P.generatorCharge;
+  if (state.generator.running) delta += P.generatorCharge * (state.fuelLineFrozen ? P.frozenLineCharge : 1);
 
   const before = state.power;
   state.power = Math.min(100, Math.max(0, state.power + delta * dt));

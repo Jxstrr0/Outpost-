@@ -4,6 +4,7 @@
 import { CONFIG } from '../config.js';
 import { parseClock } from './clock.js';
 import { doorsForNight } from '../systems/doors.js';
+import { callsForNight } from '../systems/radio.js';
 
 /**
  * @typedef {'upcoming' | 'open' | 'logged' | 'missed'} ReadingStatus
@@ -18,6 +19,8 @@ import { doorsForNight } from '../systems/doors.js';
 export function createState(night, options = {}) {
   const start = { ...CONFIG.start, ...(night.start || {}) };
   const cans = (night.jerryCans ?? 3) + (options.bonusCans || 0);
+  const extra = options.inventory || {};
+  const stock = { ...CONFIG.stock, ...(night.stock || {}) };
   return {
     night: night.night,
     seed: options.seed ?? 0,
@@ -29,9 +32,13 @@ export function createState(night, options = {}) {
     temp: start.temp,
     sanity: 100,
     sanityEnabled: (night.systems || []).includes('sanity'),
+    fedMinutes: 0, // a ration slows sanity loss while this counts down
 
     generator: { running: true, stalled: false, cranking: 0 },
     breakerTripped: false,
+    heaterFuseBlown: false,
+    fuelLineFrozen: false,
+    windowCracked: false,
     lightsOn: true,
     heaterOn: true,
     // Derived each tick by the power system:
@@ -59,11 +66,21 @@ export function createState(night, options = {}) {
     logsRecovered: [],
     notesFound: [],
 
-    inventory: { fuses: 0, food: 0, batteries: 0, ...(options.inventory || {}) },
+    // The supply room's stock, and what the player has in their pockets.
+    inventory: {
+      fuses: stock.spareFuses + (extra.fuses || 0),
+      food: stock.rations + (extra.food || 0),
+      tape: stock.tape + (extra.tape || 0),
+      batteries: extra.batteries || 0,
+    },
+    pocket: { fuse: false, tape: false, heatGun: false },
+    room: 'main', // where the player is standing; written by systems/player.js
+
+    radio: { calls: callsForNight(night), tags: [], said: [] },
 
     freezeMinutes: 0,
     lowestTemp: start.temp,
-    outcome: null, // null while playing, then 'survived' | 'frozen'
+    outcome: null, // null while playing, then 'survived' | 'frozen' | 'breakdown'
     flags: {},
   };
 }

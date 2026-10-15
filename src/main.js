@@ -19,8 +19,14 @@ import {
   unlockDoors,
   toggleFlashlight,
   giveFlashlight,
+  fillPockets,
+  ringNow,
+  sanityShock,
+  setPlayerRoom,
   FAILURE_IDS,
 } from './systems/index.js';
+import { roomAt } from './world/layout.js';
+import { ECHO_FALLBACK } from './story/radio.js';
 import { buildStation } from './world/station.js';
 import { createFlashlight } from './world/flashlight.js';
 import { createPlayer, createInputState } from './player/controller.js';
@@ -132,6 +138,16 @@ window.addEventListener(
 );
 
 events.on('scripted:anomaly', () => station.lighting.anomaly());
+// Scripted moments shake the player's nerves (night 3 on).
+for (const id of SCRIPTED_EVENTS) events.on(`scripted:${id}`, () => game.state && sanityShock(game.state, game.ctx, id));
+// Night 2: the radio plays the player's own words back to them.
+events.on('scripted:radioEcho', () => {
+  const said = game.state.radio.said;
+  const words = said[said.length - 1] || getSave().radioSaid?.at(-1) || ECHO_FALLBACK;
+  audio.play('staticBurst', 'radio');
+  if (settings().subtitles) toasts.push(`[The radio, in your own voice: "${words}" · from the supply room]`, 'subtitle');
+  else toasts.push('The radio crackles. It is your own voice.', 'warn');
+});
 
 // The title screen shows the station behind it, lit as on a calm night.
 game.state = createState(getNight(1));
@@ -293,6 +309,8 @@ function handleOutcome() {
   const { state, night } = game;
   rememberFound('logsFound', state.logsRecovered);
   rememberFound('notesFound', state.notesFound);
+  rememberFound('radioTags', state.radio.tags);
+  if (state.radio.said.length) updateSave({ radioSaid: [...(getSave().radioSaid || []), ...state.radio.said].slice(-5) });
   input.reset();
   touch.clear();
   touch.show(false);
@@ -369,6 +387,9 @@ const debug = isDebug()
         showTitle();
       },
       unlockDoors: () => unlockDoors(game.state, game.ctx),
+      ringRadio: () => ringNow(game.state, game.ctx),
+      fillPockets: () => fillPockets(game.state),
+      hallucinate: () => events.emit('sanity:hallucination', { kind: ['knocks', 'whisper', 'fakeStall', 'roofSteps'][Math.floor(Math.random() * 4)] }),
       giveFlashlight: () => giveFlashlight(game.state),
       stats: () => {
         let lights = 0;
@@ -397,6 +418,7 @@ function frame(now) {
 
   if (game.mode === 'playing') {
     player.update(dt, input, station.colliders, settings());
+    setPlayerRoom(game.state, roomAt(player.x, player.z));
     interactor.update(dt, input, game);
     if (input.torchPressed) toggleFlashlight(game.state, game.ctx);
     touch.setUseReady(!!interactor.action && !interactor.action.disabled);

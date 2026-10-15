@@ -1,4 +1,164 @@
 {
-  "comment": "Radio check-ins arrive in milestone M6. Lines are keyed by night.",
-  "lines": {}
+  "comment": "Radio calls by id. Nights schedule them in their JSON. A line with \"if\" only plays when the player has chosen a reply with that tag (this campaign); \"unless\" is the opposite. Each reply can add a tag and has Dispatch's answer.",
+  "calls": {
+    "n2a": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel-4, this is Dispatch, radio check. Imogen Price. You'll be hearing a lot of me. How's the station treating you?" }
+      ],
+      "replies": [
+        {
+          "text": "Generator's temperamental, but I'm managing.",
+          "tag": "steady",
+          "answer": [{ "who": "Dispatch", "text": "That's the job. Keep it fed and keep the readings coming. They're good readings. Dispatch out." }]
+        },
+        {
+          "text": "There were tracks outside the west door this morning.",
+          "tag": "tracks",
+          "answer": [{ "who": "Dispatch", "text": "Fox, most likely. They come in off the sea ice looking for scraps. Don't leave food out. Dispatch out." }]
+        }
+      ]
+    },
+    "n2b": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel-4, Dispatch. Your midnight reading came through. North mast is low again." },
+        { "who": "Dispatch", "text": "Any more fox tracks?", "if": "tracks" }
+      ],
+      "replies": [
+        {
+          "text": "What happened to Vance?",
+          "tag": "askedVance",
+          "answer": [{ "who": "Dispatch", "text": "Vance completed his rotation. The paperwork isn't my department. Please log the 02:00 on time." }]
+        },
+        {
+          "text": "Should I recalibrate the north mast?",
+          "tag": "obedient",
+          "answer": [{ "who": "Dispatch", "text": "No. Log it as read. Don't recalibrate. That comes from above me, not from me." }]
+        }
+      ]
+    },
+    "n3a": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel-4, Dispatch. Tonight's the north mast inspection. The tether is on the airlock wall. Clip on before you open the outer door. Every time." },
+        { "who": "Dispatch", "text": "And before you ask again: I don't have anything for you on Vance.", "if": "askedVance" }
+      ],
+      "replies": [
+        {
+          "text": "Understood. Clip on, check the mast, come back.",
+          "tag": "steady",
+          "answer": [{ "who": "Dispatch", "text": "Ninety seconds out, no more. The cold out there isn't like the cold in there. Dispatch out." }]
+        },
+        {
+          "text": "Vance went out to that mast, didn't he?",
+          "tag": "pressed",
+          "answer": [{ "who": "Dispatch", "text": "Everyone goes out to the mast. It's on the schedule. Clip on. Dispatch out." }]
+        }
+      ]
+    },
+    "n3b": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel-4... Dispatch. Your line's noisy tonight. Did you see anything out at the mast?" }
+      ],
+      "replies": [
+        {
+          "text": "Footprints. Two sets, side by side.",
+          "tag": "reportedPrints",
+          "answer": [{ "who": "Dispatch", "text": "Your own tracks from earlier. The wind fills them in unevenly. Get some rest between readings. Dispatch out." }]
+        },
+        {
+          "text": "Nothing.",
+          "tag": "lied",
+          "answer": [{ "who": "Dispatch", "text": "Good. Nothing is the right answer. Dispatch out." }]
+        }
+      ]
+    },
+    "n4a": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel-4, Dispatch. Storm front tomorrow night. The helicopter is booked for 06:00 the morning after. You're nearly done." }
+      ],
+      "replies": [
+        {
+          "text": "Tell me about Hollis.",
+          "tag": "askedHollis",
+          "answer": [{ "who": "Dispatch", "text": "Hollis was before my time. The file says he was good with generators and kept a tidy station. That's all I've got." }]
+        },
+        {
+          "text": "Good. I want to go home.",
+          "tag": "home",
+          "answer": [{ "who": "Dispatch", "text": "Everyone does, by night four. Keep the lights on. Dispatch out." }]
+        }
+      ]
+    },
+    "n4b": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel-4, Dispatch. Change of plan. The relief crew came in early and they're walking up from the pad. Unlock the west door and leave it on the latch." }
+      ],
+      "replies": [
+        {
+          "text": "At half one? In this wind?",
+          "tag": "doubted",
+          "answer": [{ "who": "Dispatch", "text": "Leave it on the latch, Kestrel-4. Please." }]
+        },
+        {
+          "text": "Understood. I'll leave it on the latch.",
+          "tag": "obeyed",
+          "answer": [{ "who": "Dispatch", "text": "Thank you. Thank you, Kestrel-4. We'll see you soon." }]
+        }
+      ]
+    },
+    "n4c": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel-4, Dispatch, routine check." },
+        { "who": "Dispatch", "text": "What call? I haven't been on this channel since nine. There's no relief crew. Nobody is walking up from anywhere." },
+        { "who": "Dispatch", "text": "Tell me you didn't touch the west door.", "if": "obeyed" }
+      ],
+      "replies": [
+        {
+          "text": "Then who was that?",
+          "tag": "askedWho",
+          "answer": [{ "who": "Dispatch", "text": "...Log the 04:00. Keep the lights on. Don't open that door for anyone, including me. Dispatch out." }]
+        },
+        {
+          "text": "Understood. The door stays shut.",
+          "tag": "steady",
+          "answer": [{ "who": "Dispatch", "text": "Keep it that way. Dispatch out." }]
+        }
+      ]
+    },
+    "n5a": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel, this is Imogen. The storm peaks tonight. The helicopter lands at 06:00 if the wind lets it." },
+        { "who": "Dispatch", "text": "From now on I'll start every call with those words. Kestrel, this is Imogen. If a call doesn't, it isn't me." }
+      ],
+      "replies": [
+        {
+          "text": "Why tell me this now?",
+          "tag": "imogenTruth",
+          "answer": [{ "who": "Dispatch", "text": "Because I finally read Vance's file. All of it. I should have read it before I sent you up there. Imogen out." }]
+        },
+        {
+          "text": "I know. I've been listening.",
+          "tag": "steady",
+          "answer": [{ "who": "Dispatch", "text": "Then you know more than I did. Keep the lights on. Imogen out." }]
+        }
+      ]
+    },
+    "n5b": {
+      "lines": [
+        { "who": "Dispatch", "text": "Kestrel-4, Dispatch. The helicopter's early. It's down by the north mast and they can't see the station in this. Come out to the mast light." }
+      ],
+      "replies": [
+        {
+          "text": "Say the words first.",
+          "tag": "tested",
+          "answer": [{ "who": "Dispatch", "text": "Kestrel... this is... (static) ...come out. It's warm out by the mast. It's so warm." }]
+        },
+        {
+          "text": "On my way.",
+          "tag": "goingOut",
+          "answer": [{ "who": "Dispatch", "text": "We'll keep the light on for you." }]
+        }
+      ]
+    }
+  },
+  "echo": "Kestrel-4. All quiet up here."
 }

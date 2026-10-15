@@ -2,8 +2,9 @@
 // Opening a panel pauses the game, so story never competes with survival.
 
 import { formatClock } from '../core/clock.js';
-import { openReading, nextUpcomingReading, logReading } from '../systems/index.js';
+import { openReading, nextUpcomingReading, logReading, chooseReply } from '../systems/index.js';
 import { LOGS, NOTES, NIGHTS } from '../story/nights.js';
+import { CALLS, visibleLines } from '../story/radio.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
@@ -103,6 +104,38 @@ export function createPanels(root, hooks) {
     for (const id of state.logsRecovered) seenLogs.add(id);
   }
 
+  /** A radio call: Dispatch speaks, the player picks a reply, Dispatch answers. */
+  function renderRadio(id) {
+    const { state, ctx } = hooks.getGame();
+    const script = CALLS[id];
+    const call = state.radio.calls.find((c) => c.id === id);
+    if (!script || !call) {
+      frame('radio', 'Radio', '<p>Static.</p>');
+      return;
+    }
+    const tags = [...new Set([...(hooks.getSave().radioTags || []), ...state.radio.tags])];
+    const say = (l) => `<div class="radio-line"><span class="who">${esc(l.who)}</span> ${esc(l.text)}</div>`;
+    let body = visibleLines(script.lines, tags).map(say).join('');
+    if (call.choice === null) {
+      body += `<div class="radio-replies">${script.replies
+        .map((r, i) => `<button class="action reply" data-reply="${i}">${esc(r.text)}</button>`)
+        .join('')}</div>`;
+    } else {
+      const reply = script.replies[call.choice];
+      body += `<div class="radio-line you"><span class="who">You</span> ${esc(reply.text)}</div>`;
+      body += visibleLines(reply.answer, tags).map(say).join('');
+      body += `<div class="radio-end">The channel goes back to static.</div>`;
+    }
+    frame('radio', 'Radio · channel 4', body);
+    screen.querySelectorAll('[data-reply]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const index = Number(b.dataset.reply);
+        chooseReply(state, ctx, id, index, script.replies[index]);
+        renderRadio(id);
+      })
+    );
+  }
+
   function renderNote(id) {
     const note = NOTES[id];
     frame('paper', note?.title || 'Note', esc(note?.text || ''));
@@ -117,6 +150,7 @@ export function createPanels(root, hooks) {
       if (kind === 'console') renderConsole();
       if (kind === 'terminal') renderTerminal();
       if (kind === 'note') renderNote(data.id);
+      if (kind === 'radio') renderRadio(data.id);
       screen.classList.remove('hidden');
       screen.querySelector('[data-close]')?.focus({ preventScroll: true });
     },

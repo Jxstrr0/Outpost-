@@ -4,11 +4,14 @@ import { CONFIG } from '../config.js';
 import nightsIndex from './data/nights.json';
 import night1 from './data/night1.json';
 import night2 from './data/night2.json';
+import night3 from './data/night3.json';
+import night4 from './data/night4.json';
+import night5 from './data/night5.json';
 import logs from './data/logs.json';
 import notes from './data/notes.json';
 import supplies from './data/supplies.json';
 
-const NIGHT_FILES = { night1, night2 };
+const NIGHT_FILES = { night1, night2, night3, night4, night5 };
 
 export const NIGHTS = nightsIndex.order.map((key) => NIGHT_FILES[key]);
 export const LOGS = logs;
