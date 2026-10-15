@@ -455,10 +455,10 @@ The biggest risk is scope creep in art and the exterior; the fallback for each r
 
 ### Open questions
 
-- [ ] Final station setting: arctic (current), deep-sea habitat or lunar relay? Arctic is assumed throughout.
-- [ ] Voice acting for radio and tapes, or text only at launch?
+- [x] Final station setting: arctic (current), deep-sea habitat or lunar relay? Answered: arctic (Decisions log).
+- [x] Voice acting for radio and tapes, or text only at launch? Answered: text only (Decisions log).
 - [ ] Free on itch.io, pay-what-you-want, or a paid Steam release later (would mean wrapping the web build)?
-- [ ] Should a third, secret ending exist for players who find every log?
+- [x] Should a third, secret ending exist for players who find every log? Answered: yes, "The Record" (Decisions log).
 
 ## Decisions log
 
