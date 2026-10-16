@@ -55,7 +55,7 @@ export function createDebugPanel(root, api) {
       <div class="dbg-row"><button data-doors>unlock doors</button><button data-torch>give flashlight</button></div>
       <div class="dbg-row"><button data-ring>radio call now</button><button data-pockets>fuse+tape+heat gun</button><button data-hallu>hallucinate</button></div>
       <div class="dbg-row"><button data-outside>go outside</button><button data-gust>gust</button></div>
-      <div class="dbg-row"><button data-westdoor>free west door</button></div>
+      <div class="dbg-row"><button data-westdoor>free west door</button><button data-detail>surfaces: ${api.surfaceDetail()}</button></div>
       <div class="dbg-row">ending: <button data-ending="relief">relief</button><button data-ending="record">record</button><button data-ending="answer">answer</button></div>
       <div class="dbg-row"><button data-wipe>wipe save</button></div>
     </div>`;
@@ -87,6 +87,9 @@ export function createDebugPanel(root, api) {
   q('[data-outside]').addEventListener('click', () => api.goOutside());
   q('[data-gust]').addEventListener('click', () => api.gust());
   q('[data-westdoor]').addEventListener('click', () => api.freeWestDoor());
+  q('[data-detail]').addEventListener('click', (e) => {
+    e.target.textContent = `surfaces: ${api.cycleSurfaceDetail()}`;
+  });
   panel.querySelectorAll('[data-ending]').forEach((b) => b.addEventListener('click', () => api.ending(b.dataset.ending)));
 
   let frames = 0;

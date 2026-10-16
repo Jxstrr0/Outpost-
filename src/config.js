@@ -185,6 +185,17 @@ export const CONFIG = {
       shade: 0.22, // how much darker the bottom of each prop part is than its top
       colorJitter: 0.05, // brightness wobble between repeated parts
     },
+    // Procedural surface textures (world/textures.js), drawn on canvases at start-up.
+    surfaces: {
+      detail: 'full', // 'full' (colour and relief), 'flat' (colour only) or 'off'; the debug panel cycles these
+      size: 512, // pixels across a floor texture; grain textures use half
+      anisotropy: 4,
+      propTile: 1.0, // metres per repeat of the grain on props and doors
+      wallTile: [1.4, 2.8], // metres per repeat on walls: one repeat is a full wall height
+      floorTile: 2.0, // metres per repeat on floors and the ceiling
+      snowTile: 2.0, // metres per repeat on the snow and the outer cladding
+      bump: { prop: 0.035, wall: 0.07, floor: 0.1, snow: 0.06 }, // relief strength per surface
+    },
   },
 
   ui: {

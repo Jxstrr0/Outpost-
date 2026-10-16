@@ -87,6 +87,7 @@ export function buildStation(scene, camera, { getLogTitle }) {
   b.decals = createDecals();
   buildShell(b);
   b.bakeRoom('shell');
+  b.bakeWalls();
   buildMainRoom(b);
   b.bakeRoom('main');
   buildGeneratorRoom(b);

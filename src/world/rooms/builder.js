@@ -2,7 +2,9 @@
 // interactables, doors and named anchors.
 
 import * as THREE from 'three';
+import { CONFIG } from '../../config.js';
 import { createKit } from '../kit.js';
+import { surfaces } from '../textures.js';
 
 const hitMaterial = new THREE.MeshBasicMaterial({ visible: false });
 
@@ -19,10 +21,13 @@ export function createBuilder(scene) {
   const group = new THREE.Group();
   scene.add(group);
   const kit = createKit();
+  // Walls get their own kit: their texture repeats once per wall height, not per metre.
+  const wallKit = createKit({ tile: CONFIG.render.surfaces.wallTile });
 
   return {
     group,
     kit,
+    wallKit,
     /** Axis-aligned boxes the player collides with, on the floor plane. `off` disables one. */
     colliders: [],
     /** Invisible boxes that block interaction rays (walls, big furniture). */
@@ -89,6 +94,16 @@ export function createBuilder(scene) {
       const mesh = kit.bake();
       if (!mesh) return null;
       mesh.name = name;
+      group.add(mesh);
+      this.meshes.push(mesh);
+      return mesh;
+    },
+
+    /** Merge every wall built so far into one mesh with the wall panel texture. */
+    bakeWalls() {
+      const mesh = wallKit.bake(surfaces().wall);
+      if (!mesh) return null;
+      mesh.name = 'walls';
       group.add(mesh);
       this.meshes.push(mesh);
       return mesh;

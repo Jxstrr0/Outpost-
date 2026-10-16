@@ -4,7 +4,11 @@
 // The loop: main → generator → supply → airlock → main.
 
 import * as THREE from 'three';
-import { PALETTE, makeFloorTexture, makeLinoleumTexture, makeCeilingTexture } from '../assets.js';
+import { CONFIG } from '../../config.js';
+import { PALETTE } from '../assets.js';
+import { surfaces } from '../textures.js';
+
+const TILE = CONFIG.render.surfaces.floorTile;
 
 export const ROOM = {
   height: 2.8,
@@ -67,7 +71,7 @@ const WALLS = [
  * rooms on either side can be painted differently.
  */
 function buildWall(b, [axis, fixed, from, to, negRoom, posRoom, openings = []]) {
-  const { kit } = b;
+  const kit = b.wallKit;
   const { height: H, wall: T } = ROOM;
   const along = axis === 'x';
   // Place a box given its extent along the wall, its offset across it, and its size.
@@ -132,10 +136,21 @@ function buildWall(b, [axis, fixed, from, to, negRoom, posRoom, openings = []]) 
   }
 }
 
-function floorPlane(group, material, minX, maxX, minZ, maxZ) {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(maxX - minX, maxZ - minZ), material);
-  mesh.rotation.x = -Math.PI / 2;
-  mesh.position.set((minX + maxX) / 2, 0, (minZ + maxZ) / 2);
+/**
+ * A flat surface at height y, facing up (floors) or down (the ceiling). Its UVs are world
+ * metres over the tile size, so the pattern lines up from room to room.
+ */
+function flatPlane(group, material, minX, maxX, minZ, maxZ, y = 0, down = false) {
+  const geometry = new THREE.PlaneGeometry(maxX - minX, maxZ - minZ);
+  const cx = (minX + maxX) / 2;
+  const cz = (minZ + maxZ) / 2;
+  const p = geometry.attributes.position;
+  const uv = geometry.attributes.uv;
+  // Rotated about x, the plane's local y runs along world z (one way or the other).
+  for (let i = 0; i < p.count; i++) uv.setXY(i, (cx + p.getX(i)) / TILE, (cz + (down ? 1 : -1) * p.getY(i)) / TILE);
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = down ? Math.PI / 2 : -Math.PI / 2;
+  mesh.position.set(cx, y, cz);
   mesh.receiveShadow = true;
   group.add(mesh);
   return mesh;
@@ -146,24 +161,12 @@ export function buildShell(b) {
   const H = ROOM.height;
 
   // Floors: linoleum in the living space, tread plate in the plant rooms.
-  const lino = makeLinoleumTexture();
-  lino.repeat.set(5.5, 5);
-  floorPlane(group, new THREE.MeshLambertMaterial({ map: lino }), -11, 0, -5, 5);
-  const tread = makeFloorTexture('#33373a');
-  tread.repeat.set(2.5, 7);
-  const treadMat = new THREE.MeshLambertMaterial({ map: tread });
-  floorPlane(group, treadMat, 0, 5, -5, 9);
-  floorPlane(group, treadMat, -2, 0, 5, 7);
-  const linoBunk = makeLinoleumTexture();
-  linoBunk.repeat.set(2, 1.5);
-  floorPlane(group, new THREE.MeshLambertMaterial({ map: linoBunk }), -6, -2, 5, 8);
-
-  const tiles = makeCeilingTexture();
-  tiles.repeat.set(8, 7);
-  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(16, 14), new THREE.MeshLambertMaterial({ map: tiles }));
-  ceiling.rotation.x = Math.PI / 2;
-  ceiling.position.set(-3, H, 2);
-  group.add(ceiling);
+  const { lino, tread, ceiling } = surfaces();
+  flatPlane(group, lino, -11, 0, -5, 5);
+  flatPlane(group, tread, 0, 5, -5, 9);
+  flatPlane(group, tread, -2, 0, 5, 7);
+  flatPlane(group, lino, -6, -2, 5, 8);
+  flatPlane(group, ceiling, -11, 5, -5, 9, H, true);
 
   for (const w of WALLS) buildWall(b, w);
 
