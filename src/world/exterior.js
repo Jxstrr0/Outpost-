@@ -6,11 +6,13 @@ import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { createKit } from './kit.js';
 import { PALETTE as C } from './assets.js';
+import { surfaces } from './textures.js';
 import { YARD } from './layout.js';
 import * as P from './props.js';
 
 const X = CONFIG.exterior;
 const R = CONFIG.render;
+const TILE = R.surfaces.snowTile;
 
 const SNOW = 0xb9c6d3;
 const CLAD = 0x5a6570;
@@ -36,7 +38,8 @@ function noPointLights(material) {
   return material;
 }
 
-const EXTERIOR_MATERIAL = noPointLights(new THREE.MeshLambertMaterial({ vertexColors: true }));
+/** The snow crust texture over everything in the yard; drawn on first use. */
+const exteriorMaterial = () => noPointLights(surfaces().snow);
 
 /** Rolling snow over the whole yard, flat where the station stands. */
 function makeGround() {
@@ -61,7 +64,10 @@ function makeGround() {
   }
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geo.computeVertexNormals();
-  const mesh = new THREE.Mesh(geo, EXTERIOR_MATERIAL);
+  // UVs in world metres, so the crust matches the cladding and the drifts built in the kit.
+  const uv = geo.attributes.uv;
+  for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / TILE, p.getZ(i) / TILE);
+  const mesh = new THREE.Mesh(geo, exteriorMaterial());
   mesh.receiveShadow = true;
   mesh.matrixAutoUpdate = false;
   mesh.updateMatrix();
@@ -325,14 +331,14 @@ function makePrints(count, w, l, color, opacity) {
  * @param {THREE.Scene} scene
  */
 export function buildExterior(b, scene) {
-  const k = createKit();
+  const k = createKit({ tile: [TILE, TILE] });
   const tags = createKit();
   buildCladding(k);
   buildFence(k, b);
   buildTether(k, tags);
   buildMast(k, b);
   buildShed(k, b);
-  const yard = k.bake(EXTERIOR_MATERIAL);
+  const yard = k.bake(exteriorMaterial());
   yard.name = 'yard';
   b.group.add(yard);
   b.meshes.push(yard);

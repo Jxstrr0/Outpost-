@@ -30,6 +30,7 @@ import {
 import { roomAt } from './world/layout.js';
 import { ECHO_FALLBACK } from './story/radio.js';
 import { buildStation } from './world/station.js';
+import { DETAIL_LEVELS, setSurfaceDetail, surfaceDetail } from './world/textures.js';
 import { createFlashlight } from './world/flashlight.js';
 import { createPlayer, createInputState } from './player/controller.js';
 import { attachDesktopInput } from './player/input-desktop.js';
@@ -415,6 +416,9 @@ const debug = isDebug()
       giveFlashlight: () => giveFlashlight(game.state),
       gust: () => startGust(game.state, game.ctx),
       freeWestDoor: () => freeWestDoor(game.state, game.ctx),
+      surfaceDetail,
+      // full → flat → off → full: compare the textured station with the plain one.
+      cycleSurfaceDetail: () => setSurfaceDetail(DETAIL_LEVELS[(DETAIL_LEVELS.indexOf(surfaceDetail()) + 1) % DETAIL_LEVELS.length]),
       ending: (id) => {
         input.reset();
         touch.clear();

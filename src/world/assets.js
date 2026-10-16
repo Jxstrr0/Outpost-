@@ -1,6 +1,7 @@
-// Shared palette, materials and canvas textures.
+// Shared palette, materials and one-off canvas textures (the window, the crack, signs).
 // Static props are built with the model kit (kit.js); the helpers here are for the few
-// meshes that move or glow on their own (lamps, levers, jerry cans, doors).
+// meshes that move or glow on their own (lamps, levers, jerry cans, doors). Tiling
+// surface textures live in textures.js.
 
 import * as THREE from 'three';
 
@@ -73,98 +74,6 @@ function canvasTexture(c, repeat = true) {
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 4;
   return tex;
-}
-
-/** Worn tread plate for the plant rooms. */
-export function makeFloorTexture(base = '#2f3438') {
-  const c = document.createElement('canvas');
-  c.width = c.height = 256;
-  const g = c.getContext('2d');
-  g.fillStyle = base;
-  g.fillRect(0, 0, 256, 256);
-  g.strokeStyle = 'rgba(0,0,0,0.35)';
-  g.lineWidth = 2;
-  for (let i = 0; i <= 256; i += 128) {
-    g.beginPath();
-    g.moveTo(i, 0);
-    g.lineTo(i, 256);
-    g.moveTo(0, i);
-    g.lineTo(256, i);
-    g.stroke();
-  }
-  // Diamond tread
-  g.fillStyle = 'rgba(255,255,255,0.05)';
-  for (let y = 6; y < 256; y += 12) {
-    for (let x = (y / 12) % 2 ? 6 : 0; x < 256; x += 12) {
-      g.save();
-      g.translate(x, y);
-      g.rotate(((x + y) / 12) % 2 ? 0.8 : -0.8);
-      g.fillRect(-3, -1, 6, 2);
-      g.restore();
-    }
-  }
-  // Scuffs and oil
-  for (let i = 0; i < 18; i++) {
-    g.fillStyle = `rgba(0,0,0,${0.05 + (i % 4) * 0.03})`;
-    g.beginPath();
-    g.ellipse((i * 71) % 256, (i * 113) % 256, 10 + (i % 5) * 6, 5 + (i % 3) * 4, i, 0, Math.PI * 2);
-    g.fill();
-  }
-  return canvasTexture(c);
-}
-
-/** Speckled linoleum tiles for the main room. */
-export function makeLinoleumTexture() {
-  const c = document.createElement('canvas');
-  c.width = c.height = 256;
-  const g = c.getContext('2d');
-  const tiles = ['#3f4237', '#3a3d33', '#43463a', '#3c3f35'];
-  for (let y = 0; y < 2; y++) {
-    for (let x = 0; x < 2; x++) {
-      g.fillStyle = tiles[(x + y * 2) % 4];
-      g.fillRect(x * 128, y * 128, 128, 128);
-    }
-  }
-  for (let i = 0; i < 1400; i++) {
-    const v = (i * 7919) % 255;
-    g.fillStyle = v % 3 ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,240,0.06)';
-    g.fillRect((i * 37) % 256, (i * 91 + (i >> 3)) % 256, 1 + (v % 2), 1);
-  }
-  g.strokeStyle = 'rgba(0,0,0,0.4)';
-  g.lineWidth = 1.5;
-  g.strokeRect(0.75, 0.75, 127, 127);
-  g.strokeRect(128.75, 128.75, 127, 127);
-  g.strokeRect(128.75, 0.75, 127, 127);
-  g.strokeRect(0.75, 128.75, 127, 127);
-  // A worn path in the middle
-  const wear = g.createRadialGradient(128, 128, 10, 128, 128, 180);
-  wear.addColorStop(0, 'rgba(255,255,230,0.05)');
-  wear.addColorStop(1, 'rgba(0,0,0,0)');
-  g.fillStyle = wear;
-  g.fillRect(0, 0, 256, 256);
-  return canvasTexture(c);
-}
-
-/** Acoustic ceiling tiles. */
-export function makeCeilingTexture() {
-  const c = document.createElement('canvas');
-  c.width = c.height = 128;
-  const g = c.getContext('2d');
-  g.fillStyle = '#4a5156';
-  g.fillRect(0, 0, 128, 128);
-  for (let i = 0; i < 260; i++) {
-    g.fillStyle = 'rgba(0,0,0,0.18)';
-    g.fillRect((i * 53) % 128, (i * 29 + (i >> 2)) % 128, 1, 1);
-  }
-  g.fillStyle = '#2a3034';
-  g.fillRect(0, 0, 128, 3);
-  g.fillRect(0, 0, 3, 128);
-  // A water stain on one tile in four.
-  g.fillStyle = 'rgba(70,52,30,0.25)';
-  g.beginPath();
-  g.ellipse(84, 90, 18, 12, 0.4, 0, Math.PI * 2);
-  g.fill();
-  return canvasTexture(c);
 }
 
 /** Soft dark blob for contact shadows under furniture. */
