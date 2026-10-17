@@ -2,6 +2,7 @@
 
 import { formatClock } from '../core/clock.js';
 import { CONFIG } from '../config.js';
+import { GRAPHICS } from '../core/save.js';
 import { SUPPLIES } from '../story/nights.js';
 import OUTCOMES from '../story/data/outcomes.json';
 import ENDINGS from '../story/data/endings.json';
@@ -266,7 +267,9 @@ export function createMenus(root) {
       pasteScreen();
     },
 
-    settings(settings, onChange, onBack) {
+    settings(settings, onChange, onBack, { graphicsAuto } = {}) {
+      const cap = (v) => v[0].toUpperCase() + v.slice(1);
+      const graphicsName = (v) => (v === 'auto' && graphicsAuto ? `Auto (now ${cap(graphicsAuto)})` : cap(v));
       show(
         `<h2>Settings</h2>
         <div class="settings-grid">
@@ -286,7 +289,12 @@ export function createMenus(root) {
           <select id="s-text">
             ${['small', 'medium', 'large'].map((v) => `<option value="${v}" ${settings.textSize === v ? 'selected' : ''}>${v[0].toUpperCase() + v.slice(1)}</option>`).join('')}
           </select>
+          <label for="s-gfx">Graphics</label>
+          <select id="s-gfx">
+            ${GRAPHICS.map((v) => `<option value="${v}" ${settings.graphics === v ? 'selected' : ''}>${graphicsName(v)}</option>`).join('')}
+          </select>
         </div>
+        <p class="code-help">Lower graphics if the game feels choppy. Auto picks for your device and steps down by itself.</p>
         <div class="btn-row"><button class="btn primary" data-back>Back</button></div>`,
         { escape: onBack }
       );
@@ -299,6 +307,7 @@ export function createMenus(root) {
       bind('#s-subs', 'subtitles', (t) => t.checked);
       bind('#s-flicker', 'reducedFlicker', (t) => t.checked);
       bind('#s-text', 'textSize', (t) => t.value);
+      bind('#s-gfx', 'graphics', (t) => t.value);
       on('[data-back]', onBack);
     },
 

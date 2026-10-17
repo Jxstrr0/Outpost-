@@ -55,7 +55,7 @@ export function createDebugPanel(root, api) {
       <div class="dbg-row"><button data-doors>unlock doors</button><button data-torch>give flashlight</button></div>
       <div class="dbg-row"><button data-ring>radio call now</button><button data-pockets>fuse+tape+heat gun</button><button data-hallu>hallucinate</button></div>
       <div class="dbg-row"><button data-outside>go outside</button><button data-gust>gust</button></div>
-      <div class="dbg-row"><button data-westdoor>free west door</button><button data-detail>surfaces: ${api.surfaceDetail()}</button></div>
+      <div class="dbg-row"><button data-westdoor>free west door</button><button data-detail>surfaces: ${api.surfaceDetail()}</button><button data-gfx>graphics</button></div>
       <div class="dbg-row">ending: <button data-ending="relief">relief</button><button data-ending="record">record</button><button data-ending="answer">answer</button></div>
       <div class="dbg-row"><button data-wipe>wipe save</button></div>
     </div>`;
@@ -90,6 +90,9 @@ export function createDebugPanel(root, api) {
   q('[data-detail]').addEventListener('click', (e) => {
     e.target.textContent = `surfaces: ${api.cycleSurfaceDetail()}`;
   });
+  q('[data-gfx]').addEventListener('click', (e) => {
+    e.target.textContent = `graphics: ${api.cycleGraphics()}`;
+  });
   panel.querySelectorAll('[data-ending]').forEach((b) => b.addEventListener('click', () => api.ending(b.dataset.ending)));
 
   let frames = 0;
@@ -106,6 +109,9 @@ export function createDebugPanel(root, api) {
         q('[data-info]').textContent = `seed ${state.seed}`;
         q('[data-clock]').textContent = `${formatClock(state.minute)} freeze ${state.freezeMinutes.toFixed(0)}m`;
         q('[data-fps]').textContent = `${fps} fps`;
+        // Auto graphics can step down by itself, so keep these labels current.
+        q('[data-gfx]').textContent = `graphics: ${api.graphics()}`;
+        q('[data-detail]').textContent = `surfaces: ${api.surfaceDetail()}`;
         const st = api.stats?.();
         if (st) q('[data-stats]').textContent = `${st.calls} draws · ${(st.triangles / 1000).toFixed(1)}k tris · ${st.lights} lights`;
         panel.querySelectorAll('[data-meter]').forEach((input) => {

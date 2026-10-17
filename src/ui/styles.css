@@ -717,6 +717,10 @@ h2 {
   font-size: 0.9em;
 }
 
+.settings-grid + .code-help {
+  margin-top: 14px;
+}
+
 .settings-grid input[type='range'] {
   width: min(42vw, 200px);
   accent-color: var(--orange);

@@ -28,6 +28,7 @@ function playedSave() {
       subtitles: false,
       reducedFlicker: true,
       textSize: 'large',
+      graphics: 'low',
     },
   };
 }
@@ -118,6 +119,7 @@ test('a correct checksum around the wrong contents is still turned down', () => 
     { ...playedSave(), supplyChoices: { two: ['fuel'] } },
     { ...playedSave(), supplyChoices: { 2: 'fuel' } },
     { ...playedSave(), settings: { ...DEFAULT_SETTINGS, textSize: 'huge' } },
+    { ...playedSave(), settings: { ...DEFAULT_SETTINGS, graphics: 'ultra' } },
     { ...playedSave(), settings: { ...DEFAULT_SETTINGS, masterVolume: 9 } },
     { ...playedSave(), settings: { ...DEFAULT_SETTINGS, invertY: 'yes' } },
     { ...playedSave(), settings: 'loud' },
