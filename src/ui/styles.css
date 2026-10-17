@@ -981,6 +981,20 @@ h2 {
   .title-sub {
     margin-bottom: 14px;
   }
+  /* Phones held sideways: lay the title buttons out in rows so the whole menu fits without scrolling. */
+  .menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .menu .menu-caption {
+    flex-basis: 100%;
+    margin: 4px 0 0;
+  }
+  .title-tag {
+    margin-bottom: 12px;
+  }
   /* Phones held sideways: keep the save code box short so Copy and Restore stay on screen. */
   .code-help {
     margin-bottom: 8px;
