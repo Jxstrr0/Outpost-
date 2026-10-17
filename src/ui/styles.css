@@ -953,7 +953,7 @@ h2 {
 
 .rotate-hint {
   position: absolute;
-  top: calc(50% - 60px);
+  top: 22%;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.7);
@@ -1005,6 +1005,23 @@ h2 {
   }
   .code-msg + .fineprint {
     margin-top: 4px;
+  }
+  /* Phones held sideways: settings and the supply drop use the width, so Back and Begin stay on screen. */
+  .screen-inner:has(.settings-grid, .supply-grid) {
+    width: min(100%, 820px);
+  }
+  .settings-grid {
+    grid-template-columns: 1fr auto 1fr auto;
+    gap: 10px 16px;
+  }
+  .settings-grid input[type='range'] {
+    width: min(18vw, 150px);
+  }
+  .summary-stats {
+    margin-bottom: 12px;
+  }
+  .supply-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
