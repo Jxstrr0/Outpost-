@@ -175,8 +175,6 @@ export const CONFIG = {
 
   render: {
     fov: 70,
-    maxPixelRatio: 2,
-    phonePixelRatio: 1.5,
     fogColor: 0x05070a,
     fogNear: 4,
     fogFar: 26,
@@ -195,6 +193,24 @@ export const CONFIG = {
       floorTile: 2.0, // metres per repeat on floors and the ceiling
       snowTile: 2.0, // metres per repeat on the snow and the outer cladding
       bump: { prop: 0.035, wall: 0.07, floor: 0.1, snow: 0.06 }, // relief strength per surface
+    },
+    // Graphics quality (Settings → Graphics, world/quality.js). 'Auto' starts on a level that
+    // suits the device and steps down one level at a time if play gets choppy.
+    quality: {
+      levels: {
+        // pixelRatio caps the screen's own; snow is the share of snowflakes drawn.
+        low: { pixelRatio: 1, surfaces: 'flat', shadows: false, snow: 0.5 },
+        medium: { pixelRatio: 1.5, surfaces: 'full', shadows: true, snow: 1 },
+        high: { pixelRatio: 2, surfaces: 'full', shadows: true, snow: 1 },
+      },
+      autoDesktop: 'high',
+      autoPhone: 'medium',
+      autoWeakPhone: 'low', // a phone that reports this much memory or less (Chrome only)
+      weakMemoryGb: 2,
+      autoMinFps: 40, // auto steps down when play averages less than this
+      autoSampleSeconds: 4, // over this long
+      autoSettleSeconds: 3, // frames this soon after starting play or changing level don't count
+      autoMaxGapSeconds: 1, // a longer frame (the tab was switched away) is left out
     },
   },
 

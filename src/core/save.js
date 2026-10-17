@@ -5,6 +5,7 @@
 export const SAVE_KEY = 'outpost.save.v1';
 export const SAVE_VERSION = 1;
 export const TEXT_SIZES = ['small', 'medium', 'large'];
+export const GRAPHICS = ['auto', 'low', 'medium', 'high'];
 
 export const DEFAULT_SETTINGS = Object.freeze({
   lookSensitivity: 1,
@@ -14,6 +15,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   subtitles: true,
   reducedFlicker: false,
   textSize: 'medium', // small | medium | large
+  graphics: 'auto', // auto | low | medium | high
 });
 
 /**

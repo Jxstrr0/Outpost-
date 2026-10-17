@@ -46,6 +46,11 @@ export function createFlashlight(camera) {
   let flickHold = 0;
 
   return {
+    /** Low graphics turns the beam's shadows off (world/quality.js). */
+    setShadows(on) {
+      beam.castShadow = on;
+    },
+
     update(state, dt, settings) {
       const torch = state.flashlight;
       hand.visible = torch.owned && torch.on;

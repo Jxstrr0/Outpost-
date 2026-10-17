@@ -31,6 +31,7 @@ import { roomAt } from './world/layout.js';
 import { ECHO_FALLBACK } from './story/radio.js';
 import { buildStation } from './world/station.js';
 import { DETAIL_LEVELS, setSurfaceDetail, surfaceDetail } from './world/textures.js';
+import { createQuality, QUALITY_LEVELS } from './world/quality.js';
 import { createFlashlight } from './world/flashlight.js';
 import { createPlayer, createInputState } from './player/controller.js';
 import { attachDesktopInput } from './player/input-desktop.js';
@@ -56,10 +57,10 @@ const uiRoot = document.getElementById('ui');
 let touchMode = isTouchDevice();
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: !touchMode, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, touchMode ? R.phonePixelRatio : R.maxPixelRatio));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
-// Only the flashlight casts shadows.
+// Only the flashlight casts shadows, and not on Low graphics. The pixel ratio is set by
+// the Graphics setting (world/quality.js).
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 
@@ -88,12 +89,14 @@ const TEXT_SCALE = { small: 0.88, medium: 1, large: 1.2 };
 function applySettings() {
   document.documentElement.style.setProperty('--text-scale', String(TEXT_SCALE[settings().textSize] || 1));
   audio.applySettings(settings());
+  quality.set(settings().graphics);
 }
 
 // ---------- World, player, UI ----------
 
 const station = buildStation(scene, camera, { getLogTitle: (id) => LOGS[id]?.title ?? id });
 const flashlight = createFlashlight(camera);
+const quality = createQuality({ renderer, flashlight, exterior: station.exterior, touch: touchMode });
 const player = createPlayer(camera);
 const input = createInputState();
 const interactor = createInteractor(camera, station);
@@ -208,7 +211,8 @@ function openSettings(back) {
       updateSettings(changes);
       applySettings();
     },
-    back
+    back,
+    { graphicsAuto: quality.autoLevel() }
   );
 }
 
@@ -419,6 +423,13 @@ const debug = isDebug()
       surfaceDetail,
       // full → flat → off → full: compare the textured station with the plain one.
       cycleSurfaceDetail: () => setSurfaceDetail(DETAIL_LEVELS[(DETAIL_LEVELS.indexOf(surfaceDetail()) + 1) % DETAIL_LEVELS.length]),
+      graphics: () => quality.level(),
+      // low → medium → high → low, through the Graphics setting so Settings shows it too.
+      cycleGraphics: () => {
+        updateSettings({ graphics: QUALITY_LEVELS[(QUALITY_LEVELS.indexOf(quality.level()) + 1) % QUALITY_LEVELS.length] });
+        applySettings();
+        return quality.level();
+      },
       ending: (id) => {
         input.reset();
         touch.clear();
@@ -463,8 +474,10 @@ let time = 0;
 
 function frame(now) {
   requestAnimationFrame(frame);
-  const dt = Math.min(0.1, (now - last) / 1000);
+  const frameSeconds = (now - last) / 1000;
+  const dt = Math.min(0.1, frameSeconds);
   last = now;
+  quality.update(frameSeconds, game.mode === 'playing');
   time += dt;
 
   if (game.mode === 'playing') {

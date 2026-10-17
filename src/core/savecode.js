@@ -13,7 +13,7 @@
 // field has the right type, and only then hands back a clean save for restoreSave().
 
 import { CONFIG } from '../config.js';
-import { SAVE_VERSION, DEFAULT_SETTINGS, TEXT_SIZES, defaultSave } from './save.js';
+import { SAVE_VERSION, DEFAULT_SETTINGS, TEXT_SIZES, GRAPHICS, defaultSave } from './save.js';
 
 const CODE_FORMAT = 1;
 export const CODE_PREFIX = `OP${CODE_FORMAT}:`;
@@ -153,6 +153,7 @@ const SETTING_CHECKS = {
   subtitles: isBool,
   reducedFlicker: isBool,
   textSize: (v) => TEXT_SIZES.includes(v),
+  graphics: (v) => GRAPHICS.includes(v),
 };
 
 /**

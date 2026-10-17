@@ -446,6 +446,11 @@ export function buildExterior(b, scene) {
       return n;
     },
 
+    /** Draw only this share of the snowflakes (lower graphics settings draw fewer). */
+    setSnowAmount(share) {
+      snow.geometry.setDrawRange(0, Math.round(X.snowFlakes * share));
+    },
+
     update(state, dt, t, camera) {
       const outside = state.room === 'outside';
       const p = camera.position;
@@ -466,7 +471,8 @@ export function buildExterior(b, scene) {
         const pos = snow.geometry.attributes.position;
         const half = X.snowBox / 2;
         const wind = X.snowWind + (X.gustSnowWind - X.snowWind) * gustMix;
-        for (let i = 0; i < pos.count; i++) {
+        const shown = Math.min(pos.count, snow.geometry.drawRange.count);
+        for (let i = 0; i < shown; i++) {
           let x = pos.getX(i) + wind * dt;
           let y = pos.getY(i) - (X.snowFall + (i % 7) * 0.08) * dt;
           let z = pos.getZ(i) + Math.sin(t * 0.7 + i) * 0.3 * dt;
