@@ -134,7 +134,7 @@ button {
   position: absolute;
   top: calc(12px + var(--safe-top));
   right: calc(14px + var(--safe-right));
-  max-width: min(46vw, 340px);
+  max-width: min(calc(50vw - 40px), 340px); /* clear of the centred pause button */
   text-align: right;
   text-shadow: 0 1px 2px #000;
 }
