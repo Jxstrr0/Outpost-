@@ -61,5 +61,47 @@
   "station": {
     "mug": "kitchen",
     "mugText": "A chipped cream mug by the sink, scrubbed clean. HOLLIS is scratched into the glaze."
-  }
+  },
+  "hints": [
+    {
+      "id": "n1-move",
+      "on": "start",
+      "after": 1,
+      "text": "WASD to walk, mouse to look. Click the game first if the mouse isn't looking around.",
+      "touch": "Drag on the left side of the screen to walk and on the right side to look around."
+    },
+    {
+      "id": "n1-meters",
+      "on": "start",
+      "after": 9,
+      "text": "Keep POWER, FUEL and TEMP up. The line at the top right says what to do next."
+    },
+    {
+      "id": "n1-use",
+      "on": "start",
+      "after": 18,
+      "text": "Walk up to something and its name appears. Press E or click to use it.",
+      "touch": "Walk up to something and its name appears. Tap USE to use it."
+    },
+    {
+      "id": "n1-reading",
+      "on": "reading:open",
+      "text": "A weather reading is due. Go to the met console in the main room and use it."
+    },
+    {
+      "id": "n1-stall",
+      "on": "generator:stalled",
+      "text": "The generator has stalled. Go to the generator room and use the engine to restart it."
+    },
+    {
+      "id": "n1-breaker",
+      "on": "breaker:tripped",
+      "text": "The breaker tripped. The panel is beside the generator room doorway. Use it to reset."
+    },
+    {
+      "id": "n1-fuel",
+      "on": "generator:outOfFuel",
+      "text": "The tank is dry. Pick up a full jerry can (generator room, east wall), carry it to the generator and use the engine to pour."
+    }
+  ]
 }

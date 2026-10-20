@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   masterVolume: 0.8,
   effectsVolume: 0.9,
   subtitles: true,
+  hints: true,
   reducedFlicker: false,
   textSize: 'medium', // small | medium | large
   graphics: 'auto', // auto | low | medium | high
@@ -32,6 +33,7 @@ export function defaultSave() {
     notesFound: [],
     tapesFound: [],
     endingsSeen: [],
+    hintsSeen: [], // ids of onboarding hints already shown
     radioTags: [], // replies chosen on the radio, which later calls react to
     radioSaid: [], // the last few things the player said on the radio
     settings: { ...DEFAULT_SETTINGS },

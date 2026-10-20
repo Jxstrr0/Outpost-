@@ -150,6 +150,8 @@ export function createHud(root) {
   let lastText = '';
 
   return {
+    el: hud,
+
     show(visible) {
       hud.classList.toggle('hidden', !visible);
       rotateHint.classList.toggle('armed', visible);

@@ -57,7 +57,7 @@ export function createDebugPanel(root, api) {
       <div class="dbg-row"><button data-outside>go outside</button><button data-gust>gust</button></div>
       <div class="dbg-row"><button data-westdoor>free west door</button><button data-detail>surfaces: ${api.surfaceDetail()}</button><button data-gfx>graphics</button></div>
       <div class="dbg-row">ending: <button data-ending="relief">relief</button><button data-ending="record">record</button><button data-ending="answer">answer</button></div>
-      <div class="dbg-row"><button data-wipe>wipe save</button></div>
+      <div class="dbg-row"><button data-hints>replay hints</button><button data-wipe>wipe save</button></div>
     </div>`;
   panel.style.pointerEvents = 'auto';
   root.appendChild(panel);
@@ -78,6 +78,7 @@ export function createDebugPanel(root, api) {
     const on = api.toggleFailures();
     e.target.textContent = `failures: ${on ? 'on' : 'off'}`;
   });
+  q('[data-hints]').addEventListener('click', () => api.resetHints());
   q('[data-wipe]').addEventListener('click', () => api.wipe());
   q('[data-doors]').addEventListener('click', () => api.unlockDoors());
   q('[data-torch]').addEventListener('click', () => api.giveFlashlight());

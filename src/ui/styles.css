@@ -282,6 +282,27 @@ button {
   color: var(--amber);
 }
 
+.hint-banner {
+  position: absolute;
+  left: 50%;
+  top: calc(76px + var(--safe-top));
+  transform: translateX(-50%);
+  width: min(70vw, 460px);
+  background: rgba(0, 0, 0, 0.62);
+  border-left: 3px solid var(--orange);
+  padding: 7px 12px;
+  border-radius: 4px;
+  font-size: 0.82em;
+  line-height: 1.35;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.hint-banner.on {
+  opacity: 1;
+}
+
 .desktop-hint {
   position: absolute;
   left: 50%;

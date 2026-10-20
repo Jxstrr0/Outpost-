@@ -151,6 +151,7 @@ const SETTING_CHECKS = {
   masterVolume: isVolume,
   effectsVolume: isVolume,
   subtitles: isBool,
+  hints: isBool,
   reducedFlicker: isBool,
   textSize: (v) => TEXT_SIZES.includes(v),
   graphics: (v) => GRAPHICS.includes(v),
