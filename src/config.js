@@ -219,6 +219,12 @@ export const CONFIG = {
     maxToasts: 3,
   },
 
+  hints: {
+    seconds: 7, // how long a hint stays up
+    gapSeconds: 1.5, // pause between one hint and the next
+    maxQueued: 3, // hints waiting their turn; extras are dropped
+  },
+
   saveCode: {
     checksumChars: 6, // characters at the end of a save code that catch damaged pastes
     maxPasteChars: 20000, // anything longer than this can't be a real code

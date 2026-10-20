@@ -40,6 +40,7 @@ import { createInteractor } from './player/interact.js';
 import { createAudio } from './audio/audio.js';
 import { createHud } from './ui/hud.js';
 import { createToasts, bindToasts } from './ui/toasts.js';
+import { createHints } from './ui/hints.js';
 import { createPanels } from './ui/panels.js';
 import { createMenus } from './ui/menus.js';
 import { NIGHTS, LAST_NIGHT, LOGS, getNight, applySupplies } from './story/nights.js';
@@ -101,6 +102,12 @@ const player = createPlayer(camera);
 const input = createInputState();
 const interactor = createInteractor(camera, station);
 const hud = createHud(uiRoot);
+const hints = createHints(hud.el, events, {
+  getSettings: settings,
+  isTouch: () => touchMode,
+  getSeen: () => getSave().hintsSeen || [],
+  markSeen: (id) => rememberFound('hintsSeen', [id]),
+});
 const toasts = createToasts(uiRoot);
 bindToasts(events, toasts);
 const audio = createAudio(camera, scene, station.anchors, events, {
@@ -256,6 +263,7 @@ function beginNight(number) {
   panels.close();
   panels.resetNight();
   toasts.clear();
+  hints.begin(night.hints);
   input.reset();
   updateSave({ currentNight: night.night });
 
@@ -322,6 +330,7 @@ function closePanel() {
 
 function handleOutcome() {
   const { state, night } = game;
+  hints.stop();
   rememberFound('logsFound', state.logsRecovered);
   rememberFound('notesFound', state.notesFound);
   rememberFound('tapesFound', state.tapesFound);
@@ -408,6 +417,10 @@ const debug = isDebug()
         game.failuresOn = !game.failuresOn;
         game.ctx = { ...nightContext(game.night), rng: game.ctx.rng };
         return game.failuresOn;
+      },
+      resetHints: () => {
+        updateSave({ hintsSeen: [] });
+        hints.begin(game.night.hints);
       },
       wipe: () => {
         resetCampaign();
@@ -510,6 +523,7 @@ function frame(now) {
   station.update(game.state, dt, time, settings());
   flashlight.update(game.state, dt, settings());
   audio.update(game.state, dt, game.mode === 'playing');
+  hints.update(dt, game.mode === 'playing');
   if (game.mode === 'playing') {
     hud.update(game.state, interactor);
     hud.setDesktopHint(!touchMode && !desktop.isLocked());

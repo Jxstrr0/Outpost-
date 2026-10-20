@@ -18,6 +18,7 @@ function playedSave() {
     notesFound: ['n01', 'n02'],
     tapesFound: ['t1'],
     endingsSeen: ['quiet'],
+    hintsSeen: ['n1-move', 'n1-reading'],
     radioTags: ['honest', 'stayed'],
     radioSaid: ['All quiet here.', "I'm staying put."],
     settings: {
@@ -26,6 +27,7 @@ function playedSave() {
       masterVolume: 0.4,
       effectsVolume: 0.65,
       subtitles: false,
+      hints: false,
       reducedFlicker: true,
       textSize: 'large',
       graphics: 'low',

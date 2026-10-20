@@ -17,6 +17,8 @@ You are the lone keeper of an arctic weather station for five nights. Keep the g
 | Flashlight (night 2 on) | TORCH button, above USE | F |
 | Pause | II button, top centre | Esc |
 
+On the first night a few short hints appear as they become useful (how to move, what the meters mean, what to do when something breaks). Each shows once, and you can turn them off in Settings.
+
 ## Save codes (moving your progress)
 
 Progress is saved in the browser you play in. To carry it to another phone or browser, or keep a backup:

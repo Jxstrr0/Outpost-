@@ -283,6 +283,8 @@ export function createMenus(root) {
           <input id="s-fx" type="range" min="0" max="1" step="0.05" value="${settings.effectsVolume}" />
           <label for="s-subs">Subtitles for sounds</label>
           <input id="s-subs" type="checkbox" ${settings.subtitles ? 'checked' : ''} />
+          <label for="s-hints">Hints on the first night</label>
+          <input id="s-hints" type="checkbox" ${settings.hints !== false ? 'checked' : ''} />
           <label for="s-flicker">Reduced flicker and motion</label>
           <input id="s-flicker" type="checkbox" ${settings.reducedFlicker ? 'checked' : ''} />
           <label for="s-text">Text size</label>
@@ -305,6 +307,7 @@ export function createMenus(root) {
       bind('#s-master', 'masterVolume', (t) => Number(t.value));
       bind('#s-fx', 'effectsVolume', (t) => Number(t.value));
       bind('#s-subs', 'subtitles', (t) => t.checked);
+      bind('#s-hints', 'hints', (t) => t.checked);
       bind('#s-flicker', 'reducedFlicker', (t) => t.checked);
       bind('#s-text', 'textSize', (t) => t.value);
       bind('#s-gfx', 'graphics', (t) => t.value);
