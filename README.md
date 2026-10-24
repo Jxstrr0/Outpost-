@@ -33,8 +33,9 @@ The code holds your nights, supply choices, logs and notes found, and settings. 
 - `docs/DESIGN.md`: the full design and the decisions log. Start here.
 - `CLAUDE.md`: standing instructions for Claude Code.
 - `src/config.js`: every tuning number.
-- `src/story/data/`: nights, keeper logs, notes, supplies and subtitles, as JSON.
+- `src/story/data/`: nights, keeper logs, notes, tapes, radio calls, endings, supplies and subtitles, as JSON.
 - `public/audio/`: recorded sound layers (CC0, from Kenney). Credits in `public/audio/CREDITS.md`.
+- `test/`: the headless tests that `npm test` runs.
 
 ## Working on it
 
